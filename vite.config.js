@@ -177,7 +177,7 @@ const flapProxy = () => ({
           apiKey: 'gmgn_6c719521eb31032ca2ecf471b0143fab',
           host: 'https://openapi.gmgn.ai'
         });
-        const apiRes = await client.getTrenches('bsc', ['new_creation', 'near_completion', 'completed'], ['flap'], 80);
+        const apiRes = await client.getTrenches('bsc', ['new_creation', 'near_completion'], ['flap'], 80);
         
         const rawList = [
           ...(Array.isArray(apiRes?.new_creation) ? apiRes.new_creation : []),
@@ -371,7 +371,14 @@ const flapProxy = () => ({
           }).catch(err => { res.statusCode = 500; res.end(JSON.stringify({ error: err.message })); });
       } else {
         const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-        executeRpc('eth_getLogs', [{ fromBlock, toBlock, address: tokenAddress, topics: [TRANSFER_TOPIC] }])
+        const getLogsPromise = (fromBlock === '0x0' || fromBlock === '0')
+          ? executeRpc('eth_blockNumber', []).then(hex => {
+              const safeFrom = '0x' + Math.max(0, parseInt(hex, 16) - 3000).toString(16);
+              return executeRpc('eth_getLogs', [{ fromBlock: safeFrom, toBlock, address: tokenAddress, topics: [TRANSFER_TOPIC] }]);
+            })
+          : executeRpc('eth_getLogs', [{ fromBlock, toBlock, address: tokenAddress, topics: [TRANSFER_TOPIC] }]);
+        
+        getLogsPromise
           .then(logs => {
             const trades = (logs || []).map(l => {
               const fromAddr = '0x' + l.topics[1].slice(26); const toAddr   = '0x' + l.topics[2].slice(26);
