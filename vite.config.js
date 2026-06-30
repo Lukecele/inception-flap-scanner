@@ -130,7 +130,7 @@ const flapProxy = () => ({
               const webDuplicateOf = registerSocialUrl(websiteUrl, tokenAddress);
               
               if (tgDuplicateOf) { info.telegram_dup = 1; info.telegram_clone_of = tgDuplicateOf; }
-              if (xDuplicateOf) { info.twitter_dup = 1; info.twitter_clone_of = xCloneOf; }
+              if (xDuplicateOf) { info.twitter_dup = 1; info.twitter_clone_of = xDuplicateOf; }
               if (webDuplicateOf) { info.website_dup = 1; info.website_clone_of = webDuplicateOf; }
 
               const lowercaseAddr = tokenAddress.toLowerCase();
@@ -238,25 +238,37 @@ const flapProxy = () => ({
       }
     });
 
-    // RIPRISTINATO: Endpoint Holders per la modale di dettaglio
+    // RIPRISTINATO: Endpoint Holders ottimizzato con estrazione data.list per compatibilità frontend
     server.middlewares.use('/api/gmgn/holders', (req, res) => {
       const parts = req.url.split('/');
       const tokenAddress = parts[parts.length - 1].split('?')[0];
-      exec(`gmgn-cli token holders --chain bsc --address ${tokenAddress}`, (err, stdout) => {
+      exec(`gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`, (err, stdout) => {
         if (err) { res.statusCode = 500; res.end(JSON.stringify({ error: err.message })); return; }
         res.setHeader('Content-Type', 'application/json');
-        res.end(stdout);
+        try {
+          const parsed = JSON.parse(stdout);
+          const targetList = parsed?.data?.list || parsed?.list || [];
+          res.end(JSON.stringify({ list: targetList }));
+        } catch (_) {
+          res.end(JSON.stringify({ list: [] }));
+        }
       });
     });
 
-    // RIPRISTINATO: Endpoint Traders per la tabella transazioni
+    // RIPRISTINATO: Endpoint Traders ottimizzato con estrazione data.list per compatibilità frontend
     server.middlewares.use('/api/gmgn/traders', (req, res) => {
       const parts = req.url.split('/');
       const tokenAddress = parts[parts.length - 1].split('?')[0];
-      exec(`gmgn-cli token traders --chain bsc --address ${tokenAddress}`, (err, stdout) => {
+      exec(`gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`, (err, stdout) => {
         if (err) { res.statusCode = 500; res.end(JSON.stringify({ error: err.message })); return; }
         res.setHeader('Content-Type', 'application/json');
-        res.end(stdout);
+        try {
+          const parsed = JSON.parse(stdout);
+          const targetList = parsed?.data?.list || parsed?.list || [];
+          res.end(JSON.stringify({ list: targetList }));
+        } catch (_) {
+          res.end(JSON.stringify({ list: [] }));
+        }
       });
     });
 
