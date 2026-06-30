@@ -8,7 +8,6 @@ import crypto from 'crypto';
 const flapProxy = () => ({
   name: 'flap-proxy',
   configureServer(server) {
-    // Percorso relativo per il file JSON
     const socialsDbPath = './scanned_socials.json';
     let db = { socials: {}, tokens: {} };
     try {
@@ -166,8 +165,22 @@ const flapProxy = () => ({
 
     server.middlewares.use('/api/gmgn/launches', async (req, res) => {
       try {
-        // Riferimento relativo interno a node_modules
-        const { OpenApiClient } = require('gmgn-cli/dist/client/OpenApiClient.js');
+        // Fallback intelligente dei percorsi di inclusione (Locale NPM -> Docker Cloud -> PC NVM)
+        let OpenApiClient;
+        try {
+          OpenApiClient = require('gmgn-cli/dist/client/OpenApiClient.js').OpenApiClient;
+        } catch (e) {
+          try {
+            OpenApiClient = require('/usr/local/lib/node_modules/gmgn-cli/dist/client/OpenApiClient.js').OpenApiClient;
+          } catch (e2) {
+            OpenApiClient = require('/home/luca/.nvm/versions/node/v22.22.1/lib/node_modules/gmgn-cli/dist/client/OpenApiClient.js').OpenApiClient;
+          }
+        }
+
+        if (!OpenApiClient) {
+          throw new Error("Impossibile caricare l'SDK di gmgn-cli in nessun percorso.");
+        }
+
         const client = new OpenApiClient({
           apiKey: 'gmgn_6c719521eb31032ca2ecf471b0143fab',
           host: 'https://openapi.gmgn.ai'
@@ -265,6 +278,8 @@ const flapProxy = () => ({
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, tokens: formattedList }));
       } catch (err) {
+        // Logga l'errore esatto nel terminale del container cloud
+        console.error("[CRITICAL BACKEND ERROR IN /api/gmgn/launches]:", err);
         res.statusCode = 500;
         res.end(JSON.stringify({ success: false, error: err.message }));
       }
@@ -319,7 +334,6 @@ const flapProxy = () => ({
       const apiKey = 'gmgn_6c719521eb31032ca2ecf471b0143fab';
       let privateKeyPem;
       try {
-        // Percorso relativo della chiave .pem
         privateKeyPem = fs.readFileSync('./gmgn_private.pem', 'utf8');
       } catch (e) {
         res.statusCode = 500;
