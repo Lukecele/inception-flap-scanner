@@ -850,7 +850,7 @@ const Scanner = () => {
             if (isMounted) setCurrentBlock(currentLatest);
 
             // Fetch last 50 blocks for reliability (covers ~150s at 3s/block)
-            const startBlock = Math.max(0, currentLatest - 50);
+            const startBlock = Math.max(0, currentLatest - 9);
             
             let logs = [];
             try {
