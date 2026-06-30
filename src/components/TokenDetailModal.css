@@ -1,0 +1,480 @@
+/* === Detail Modal Overlay === */
+.detail-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(4, 5, 8, 0.90);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* === Modal Card === */
+.detail-modal-card {
+  background: rgba(11, 12, 16, 0.98);
+  border: 1px solid rgba(102, 252, 241, 0.22);
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(102, 252, 241, 0.05);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 1160px;
+  height: calc(100dvh - 1rem);
+  max-height: 940px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* === Modal Header — always visible, never clipped === */
+.modal-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+  gap: 0.6rem;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;        /* allows text truncation */
+  flex: 1;
+  overflow: hidden;
+}
+
+.modal-token-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(102, 252, 241, 0.25);
+  flex-shrink: 0;
+}
+
+.modal-header-left h2 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-token-addr {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-family: 'Courier New', monospace;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.modal-token-addr span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-token-addr a { color: var(--accent-cyan); text-decoration: none; flex-shrink: 0; }
+.modal-token-addr a:hover { text-decoration: underline; }
+
+/* CLOSE/BACK BUTTON — always visible, never hidden */
+.close-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.38rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;       /* critical: never shrinks away */
+  white-space: nowrap;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.close-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--text-bright);
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* === Body Grid — fills remaining height === */
+.modal-body-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  overflow: hidden;
+}
+
+/* === Left Column === */
+.modal-chart-column {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Tab bar */
+.modal-tab-selector {
+  flex-shrink: 0;
+  display: flex;
+  gap: 5px;
+  padding: 0.65rem 1rem 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 5px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tab-btn.active {
+  background: rgba(102, 252, 241, 0.1);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Chart / tab content area */
+.chart-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.chart-iframe {
+  width: 100%;
+  height: 400px;
+  max-height: 50vh;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: #131722;
+}
+
+.links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+/* Holders / Traders */
+.holders-tab-content,
+.traders-tab-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.5rem 1rem 1rem;
+}
+
+/* === Right Column (Trading Panel) === */
+.modal-trading-column {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.8rem;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+/* === Modal Box === */
+.modal-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.8rem;
+  flex-shrink: 0;
+}
+.box-title {
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  margin: 0 0 0.6rem 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.35rem;
+}
+
+/* === Metrics Grid === */
+.metrics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+.metrics-grid > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+}
+.metrics-grid .label { color: var(--text-muted); }
+.metrics-grid .val { color: var(--text-bright); font-weight: 700; }
+
+/* === Trade Type Tabs === */
+.trade-type-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.type-tab {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.38rem 0;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.type-tab.active.buy-tab {
+  background: rgba(0, 255, 135, 0.12);
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+.type-tab.active.sell-tab {
+  background: rgba(255, 78, 100, 0.12);
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+/* === Input Panel === */
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.45rem;
+}
+.input-panel .label {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.input-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.amount-input, .slippage-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.42rem 0.6rem;
+  color: var(--text-bright);
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.amount-input:focus, .slippage-input:focus { border-color: var(--accent-cyan); }
+.input-row .unit {
+  position: absolute;
+  right: 0.6rem;
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  pointer-events: none;
+}
+.quick-presets {
+  display: flex;
+  gap: 0.3rem;
+}
+.quick-presets button {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.2rem 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.quick-presets button:hover,
+.quick-presets button.active {
+  background: rgba(102, 252, 241, 0.1);
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+/* === Quote Preview === */
+.quote-preview {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  border-top: 1px dashed rgba(255,255,255,0.05);
+  padding-top: 5px;
+  margin-top: 4px;
+  min-height: 18px;
+}
+
+/* === Wallet Connect === */
+.wallet-status-bar { display: flex; width: 100%; margin-bottom: 0.45rem; }
+.connect-wallet-btn {
+  width: 100%;
+  background: rgba(102, 252, 241, 0.07);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-weight: 800;
+  font-size: 0.68rem;
+  padding: 0.38rem 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.connect-wallet-btn:hover { background: var(--accent-cyan); color: #0b0c10; }
+.wallet-info {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 0.32rem 0.5rem;
+  border-radius: 6px;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* === Swap Button === */
+.swap-btn {
+  width: 100%;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 0.58rem 0;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.buy-btn { background: var(--accent-green); color: #0b0c10; }
+.buy-btn:hover { box-shadow: 0 0 16px rgba(0, 255, 135, 0.45); transform: translateY(-1px); }
+.sell-btn { background: var(--accent-red); color: var(--text-bright); }
+.sell-btn:hover { box-shadow: 0 0 16px rgba(255, 78, 100, 0.45); transform: translateY(-1px); }
+.swap-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+/* === Fee Notice === */
+.fee-notice {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.25rem;
+  border-radius: 4px;
+  border: 1px dashed rgba(255, 255, 255, 0.05);
+  margin-bottom: 0.4rem;
+}
+
+/* === Logs Panel === */
+.logs-panel {
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 0.45rem;
+  font-size: 0.58rem;
+  color: #00ff66;
+  max-height: 90px;
+  overflow-y: auto;
+}
+.log-line { margin-bottom: 2px; line-height: 1.4; }
+
+/* === Modal Chips === */
+.modal-chip {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 0.26rem 0.55rem;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.modal-chip:hover {
+  background: rgba(102, 252, 241, 0.08);
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+/* === Animations === */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.animate-fade-in { animation: fadeIn 0.16s ease forwards; }
+.animate-scale-in { animation: scaleIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.spin-icon { animation: spin 1s linear infinite; }
+
+/* === Responsive === */
+@media (max-width: 900px) {
+  .modal-body-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  .modal-chart-column {
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    max-height: 55vh;
+  }
+  .modal-trading-column {
+    max-height: 45vh;
+  }
+  .chart-iframe { height: 260px; }
+}
+
+@media (max-width: 600px) {
+  .detail-modal-card {
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+  .modal-tab-selector { gap: 3px; padding: 0.5rem 0.6rem 0.4rem; }
+  .tab-btn { font-size: 0.6rem; padding: 4px 6px; }
+  .close-btn span { display: none; }
+}

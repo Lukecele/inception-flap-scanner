@@ -1,0 +1,108 @@
+.panel-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.inline-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.mr-1 {
+  margin-right: 0.25rem;
+}
+
+.text-sm {
+  font-size: 0.85rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-muted {
+  color: rgba(197, 198, 199, 0.5);
+}
+
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.stream-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.stream-item {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-red);
+  transition: all 0.2s ease;
+}
+
+.stream-item:hover {
+  background: rgba(0, 0, 0, 0.4);
+  transform: translateX(2px);
+}
+
+.stream-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  border: 1px solid;
+}
+
+.stream-info {
+  flex: 1;
+}
+
+.stream-name {
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.stream-meta {
+  min-width: 80px;
+}
+
+.stream-footer {
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  color: var(--accent-red);
+  display: flex;
+  align-items: center;
+}

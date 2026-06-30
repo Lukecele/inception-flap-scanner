@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/gmgn/:path*",
+      "destination": "https://gmgn.ai/:path*"
+    },
+    {
+      "source": "/api/flap/:path*",
+      "destination": "https://URL_REALE_DI_FLAP_QUI/:path*"
+    }
+  ]
+}
