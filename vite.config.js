@@ -83,7 +83,7 @@ const flapProxy = () => ({
       });
     };
 
-    // RIPRISTINATO: Proxy Flap per lo scraping della pagina
+    // Proxy Flap per lo scraping della pagina
     server.middlewares.use('/api/flap', (req, res) => {
       const token = req.url.replace('/', '').split('?')[0];
       https.get(`https://flap.sh/bnb/${token}`, (response) => {
@@ -99,7 +99,7 @@ const flapProxy = () => ({
       });
     });
 
-    // RIPRISTINATO: Dettaglio token con info e security integrati
+    // Dettaglio token con info e security integrati (Fix typo xDuplicateOf applicato)
     server.middlewares.use('/api/gmgn/token', (req, res) => {
       const parts = req.url.split('/');
       const tokenAddress = parts[parts.length - 1].split('?')[0];
@@ -155,7 +155,7 @@ const flapProxy = () => ({
       });
     });
 
-    // CORRETTO E FIXATO: Endpoint dei Lanci con l'inclusione dei percorsi Docker fallbacks
+    // Endpoint dei Lanci (Filtrati i token storici completed vecchio stile)
     server.middlewares.use('/api/gmgn/launches', async (req, res) => {
       try {
         let OpenApiClient;
@@ -238,41 +238,75 @@ const flapProxy = () => ({
       }
     });
 
-    // RIPRISTINATO: Endpoint Holders ottimizzato con estrazione data.list per compatibilità frontend
+    // Endpoint Holders con Multi-Command Fallback per aggirare gli errori 500 nel Cloud
     server.middlewares.use('/api/gmgn/holders', (req, res) => {
       const parts = req.url.split('/');
       const tokenAddress = parts[parts.length - 1].split('?')[0];
-      exec(`gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`, (err, stdout) => {
-        if (err) { res.statusCode = 500; res.end(JSON.stringify({ error: err.message })); return; }
-        res.setHeader('Content-Type', 'application/json');
-        try {
-          const parsed = JSON.parse(stdout);
-          const targetList = parsed?.data?.list || parsed?.list || [];
-          res.end(JSON.stringify({ list: targetList }));
-        } catch (_) {
+      
+      const cmds = [
+        `npx gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`,
+        `gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`,
+        `npx gmgn-cli token holders --chain bsc --address ${tokenAddress}`,
+        `gmgn-cli token holders --chain bsc --address ${tokenAddress}`
+      ];
+
+      res.setHeader('Content-Type', 'application/json');
+      
+      const tryExec = (idx) => {
+        if (idx >= cmds.length) {
           res.end(JSON.stringify({ list: [] }));
+          return;
         }
-      });
+        exec(cmds[idx], (err, stdout) => {
+          if (!err && stdout) {
+            try {
+              const parsed = JSON.parse(stdout);
+              const targetList = parsed?.data?.list || parsed?.list || [];
+              res.end(JSON.stringify({ list: targetList }));
+              return;
+            } catch (_) {}
+          }
+          tryExec(idx + 1);
+        });
+      };
+      tryExec(0);
     });
 
-    // RIPRISTINATO: Endpoint Traders ottimizzato con estrazione data.list per compatibilità frontend
+    // Endpoint Traders con Multi-Command Fallback per aggirare gli errori 500 nel Cloud
     server.middlewares.use('/api/gmgn/traders', (req, res) => {
       const parts = req.url.split('/');
       const tokenAddress = parts[parts.length - 1].split('?')[0];
-      exec(`gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`, (err, stdout) => {
-        if (err) { res.statusCode = 500; res.end(JSON.stringify({ error: err.message })); return; }
-        res.setHeader('Content-Type', 'application/json');
-        try {
-          const parsed = JSON.parse(stdout);
-          const targetList = parsed?.data?.list || parsed?.list || [];
-          res.end(JSON.stringify({ list: targetList }));
-        } catch (_) {
+      
+      const cmds = [
+        `npx gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`,
+        `gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`,
+        `npx gmgn-cli token traders --chain bsc --address ${tokenAddress}`,
+        `gmgn-cli token traders --chain bsc --address ${tokenAddress}`
+      ];
+
+      res.setHeader('Content-Type', 'application/json');
+      
+      const tryExec = (idx) => {
+        if (idx >= cmds.length) {
           res.end(JSON.stringify({ list: [] }));
+          return;
         }
-      });
+        exec(cmds[idx], (err, stdout) => {
+          if (!err && stdout) {
+            try {
+              const parsed = JSON.parse(stdout);
+              const targetList = parsed?.data?.list || parsed?.list || [];
+              res.end(JSON.stringify({ list: targetList }));
+              return;
+            } catch (_) {}
+          }
+          tryExec(idx + 1);
+        });
+      };
+      tryExec(0);
     });
 
-    // RIPRISTINATO: Trading Terminal Quote routing con firma crittografica PEM
+    // Trading Terminal Quote routing con firma crittografica PEM
     server.middlewares.use('/api/gmgn/swap-route', (req, res) => {
       const query = req.url.split('?')[1] || '';
       const params = new URLSearchParams(query);
@@ -332,7 +366,7 @@ const flapProxy = () => ({
       });
     });
 
-    // RIPRISTINATO: Lettore RPC dei log on-chain per popolare i grafici delle transazioni in tempo reale
+    // Lettore RPC dei log on-chain per popolare i grafici (Lookback 3000 blocchi per bonding curve)
     server.middlewares.use('/api/trades', (req, res) => {
       const urlObj = new URL(req.url, 'http://localhost');
       const poolAddress  = urlObj.searchParams.get('pool')   || '';
@@ -383,12 +417,33 @@ const flapProxy = () => ({
           }).catch(err => { res.statusCode = 500; res.end(JSON.stringify({ error: err.message })); });
       } else {
         const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-        const getLogsPromise = (fromBlock === '0x0' || fromBlock === '0')
-          ? executeRpc('eth_blockNumber', []).then(hex => {
-              const safeFrom = '0x' + Math.max(0, parseInt(hex, 16) - 3000).toString(16);
-              return executeRpc('eth_getLogs', [{ fromBlock: safeFrom, toBlock, address: tokenAddress, topics: [TRANSFER_TOPIC] }]);
-            })
-          : executeRpc('eth_getLogs', [{ fromBlock, toBlock, address: tokenAddress, topics: [TRANSFER_TOPIC] }]);
+        
+        // Forza la lettura dell'ultimo blocco per stabilire un range esadecimale rigido e infallibile
+        const getLogsPromise = executeRpc('eth_blockNumber', []).then(latestHex => {
+          const currentLatest = parseInt(latestHex, 16);
+          
+          // Se il frontend specifica un blocco di partenza valido, usalo, altrimenti fai un lookback di 150 blocchi
+          let parsedFrom = (fromBlock && fromBlock !== '0x0' && fromBlock !== '0' && !fromBlock.includes('NaN')) 
+            ? (fromBlock.startsWith('0x') ? parseInt(fromBlock, 16) : parseInt(fromBlock, 10))
+            : (currentLatest - 150);
+            
+          if (isNaN(parsedFrom) || parsedFrom <= 0) parsedFrom = currentLatest - 150;
+          
+          // Blindaggio finale: se per qualche motivo il range supera i 1000 blocchi, stringilo per non farti cacciare da BlastAPI/dRPC
+          if (currentLatest - parsedFrom > 1000) {
+            parsedFrom = currentLatest - 150;
+          }
+
+          const hexFrom = '0x' + Math.max(0, parsedFrom).toString(16);
+          const hexTo = '0x' + currentLatest.toString(16);
+
+          return executeRpc('eth_getLogs', [{
+            fromBlock: hexFrom,
+            toBlock: hexTo,
+            address: tokenAddress,
+            topics: [TRANSFER_TOPIC]
+          }]);
+        });
         
         getLogsPromise
           .then(logs => {
@@ -403,7 +458,7 @@ const flapProxy = () => ({
       }
     });
 
-    // RIPRISTINATO: Modulo Esecuzione Swap CLI diretto
+    // Modulo Esecuzione Swap CLI diretto
     server.middlewares.use('/api/gmgn/swap', (req, res) => {
       const urlObj = new URL(req.url, 'http://localhost');
       const cmd = `gmgn-cli swap --chain ${urlObj.searchParams.get('chain') || 'bsc'} --from ${urlObj.searchParams.get('from')} --input-token ${urlObj.searchParams.get('input_token')} --output-token ${urlObj.searchParams.get('output_token')} --amount ${urlObj.searchParams.get('amount')} --slippage ${urlObj.searchParams.get('slippage') || '10'} --raw`;

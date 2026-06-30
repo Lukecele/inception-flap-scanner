@@ -160,29 +160,42 @@ const Scanner = () => {
     let devClusterHistory = "Analisi dev non disponibile";
     let funderText = "";
     let pastScamsCount = 0;
+    let bscScanSuccess = false;
+
     try {
       const scanRes = await fetch(`https://api.bscscan.com/api?module=account&action=txlist&address=${trueDev}&startblock=0&endblock=99999999&page=1&offset=2&sort=asc`);
-      const scanData = await scanRes.json();
-      if (scanData.status === "1" && scanData.result?.length > 0) {
-        const funder = scanData.result[0].from?.toLowerCase() === trueDev.toLowerCase() ? scanData.result[0].to : scanData.result[0].from;
-        const cnt = await safeCall(p => p.getTransactionCount(funder));
-        if (cnt > 1000) {
-          devClusterHistory = "✅ Funder: Exchange/Bridge";
-          funderText = `${funder.slice(0, 10)}...`;
-        } else if (cnt > 20) {
-          devClusterHistory = `🚨 Funder sospetto (${cnt} txs)`;
-          pastScamsCount = cnt;
-          funderText = `Cluster scam: ${funder.slice(0, 10)}...`;
-        } else {
-          devClusterHistory = `✅ Wallet privato (${cnt} txs)`;
-          funderText = `${funder.slice(0, 10)}...`;
+      if (scanRes.ok) {
+        const scanData = await scanRes.json();
+        if (scanData && scanData.status === "1" && scanData.result?.length > 0) {
+          const funder = scanData.result[0].from?.toLowerCase() === trueDev.toLowerCase() ? scanData.result[0].to : scanData.result[0].from;
+          const cnt = await safeCall(p => p.getTransactionCount(funder));
+          if (cnt !== null && cnt !== undefined) {
+            if (cnt > 1000) {
+              devClusterHistory = "✅ Funder: Exchange/Bridge";
+              funderText = `${funder.slice(0, 10)}...`;
+            } else if (cnt > 20) {
+              devClusterHistory = `🚨 Funder sospetto (${cnt} txs)`;
+              pastScamsCount = cnt;
+              funderText = `Cluster scam: ${funder.slice(0, 10)}...`;
+            } else {
+              devClusterHistory = `✅ Wallet privato (${cnt} txs)`;
+              funderText = `${funder.slice(0, 10)}...`;
+            }
+            bscScanSuccess = true;
+          }
         }
-      } else {
-        const cnt = await safeCall(p => p.getTransactionCount(trueDev));
-        devClusterHistory = cnt > 10 ? `🚨 Dev seriale (${cnt} TX)` : `✅ Dev nuovo (${cnt} TX)`;
-        pastScamsCount = cnt > 10 ? cnt : 0;
       }
     } catch (_) {}
+
+    if (!bscScanSuccess) {
+      try {
+        const cnt = await safeCall(p => p.getTransactionCount(trueDev));
+        if (cnt !== null && cnt !== undefined) {
+          devClusterHistory = cnt > 10 ? `🚨 Dev seriale (${cnt} TX)` : `✅ Dev nuovo (${cnt} TX)`;
+          pastScamsCount = cnt > 10 ? cnt : 0;
+        }
+      } catch (_) {}
+    }
 
     setTokens(prev => prev.map(t => {
       if (t.tokenAddress?.toLowerCase() === tokenKey) {
@@ -239,7 +252,6 @@ const Scanner = () => {
     };
   }, []);
 
-  // Sbarramento di visualizzazione: nasconde solo ed esclusivamente se la tassa sale sopra il 9%
   const validTokens = tokens.filter(t => {
     const isBuyHigh = t.buyTax !== null && t.buyTax > 9;
     const isSellHigh = t.sellTax !== null && t.sellTax > 9;
@@ -276,7 +288,6 @@ const Scanner = () => {
             <p>In ascolto sui nuovi lanci di Flap...</p>
           </div>
         ) : validTokens.map((token, idx) => {
-          // GLI ALTRI CONTROLLI RESTANO NEL RENDERING: Colorano la card di rosso (scarto) senza nasconderla!
           const isScrap = token.pastScamsCount > 20 || token.hasSocialClone || 
                           token.isHoneypot || token.taxInnovation?.includes('🆕 Proxy Custom');
           const isPending = token.devClusterHistory === "Analisi BscScan...";
@@ -310,7 +321,6 @@ const Scanner = () => {
               </div>
 
               <div className="phases-grid">
-                {/* FASE 1: TAX */}
                 <div className="phase-box">
                   <div className="phase-title text-cyan"><Shield size={12} className="mr-1"/>FASE 1 · TAX</div>
                   {token.isHoneypot ? (
@@ -324,7 +334,6 @@ const Scanner = () => {
                   )}
                 </div>
 
-                {/* FASE 2: SOCIAL */}
                 <div className="phase-box">
                   <div className="phase-title text-purple"><Search size={12} className="mr-1"/>FASE 2 · SOCIAL</div>
                   {token.hasSocialClone ? (
@@ -343,7 +352,6 @@ const Scanner = () => {
                   </div>
                 </div>
 
-                {/* FASE 4: DEV */}
                 <div className="phase-box">
                   <div className="phase-title text-red"><Network size={12} className="mr-1"/>FASE 4 · DEV</div>
                   <a href={`https://gmgn.ai/bsc/address/${token.creator}`} target="_blank" rel="noreferrer" className="text-purple text-xs hover-underline font-mono" onClick={e => e.stopPropagation()}>
@@ -355,7 +363,6 @@ const Scanner = () => {
                   {token.funderText && <div className="text-xs text-muted mt-1 font-mono">{token.funderText}</div>}
                 </div>
 
-                {/* FASE 5: METRICHE */}
                 <div className="phase-box">
                   <div className="phase-title text-yellow"><Activity size={12} className="mr-1"/>GMGN METRICHE</div>
                   <div className="text-xs text-muted leading-relaxed font-mono">
@@ -365,7 +372,6 @@ const Scanner = () => {
                   </div>
                 </div>
 
-                {/* FASE 3: TAX IMPL */}
                 <div className="phase-box">
                   <div className="phase-title text-bright"><Brain size={12} className="mr-1"/>FASE 3 · TAX IMPL</div>
                   <div className={`text-xs font-bold mb-2 ${
