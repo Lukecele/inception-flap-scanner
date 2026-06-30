@@ -244,10 +244,9 @@ const flapProxy = () => ({
       const tokenAddress = parts[parts.length - 1].split('?')[0];
       
       const cmds = [
+        `./node_modules/.bin/gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`,
         `npx gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`,
-        `gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`,
-        `npx gmgn-cli token holders --chain bsc --address ${tokenAddress}`,
-        `gmgn-cli token holders --chain bsc --address ${tokenAddress}`
+        `gmgn-cli token holders --chain bsc --address ${tokenAddress} --raw`
       ];
 
       res.setHeader('Content-Type', 'application/json');
@@ -278,10 +277,9 @@ const flapProxy = () => ({
       const tokenAddress = parts[parts.length - 1].split('?')[0];
       
       const cmds = [
+        `./node_modules/.bin/gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`,
         `npx gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`,
-        `gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`,
-        `npx gmgn-cli token traders --chain bsc --address ${tokenAddress}`,
-        `gmgn-cli token traders --chain bsc --address ${tokenAddress}`
+        `gmgn-cli token traders --chain bsc --address ${tokenAddress} --raw`
       ];
 
       res.setHeader('Content-Type', 'application/json');
