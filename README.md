@@ -58,6 +58,22 @@ Visit [http://localhost:7860](http://localhost:7860) to view the scanner dashboa
 
 ---
 
+## Configuration & Security
+
+The scanner is designed to function with zero external secrets out of the box for public on-chain reading, RPC log decoding, and contract analysis.
+
+Optional authenticated features (such as automated GMGN trade routing and cryptographic quote verification) can be configured via environment variables:
+
+| Variable | Description | Required |
+| :--- | :--- | :--- |
+| `GMGN_API_KEY` | GMGN OpenAPI client key | Optional (defaults to public read) |
+| `GMGN_PRIVATE_KEY` | Ed25519 private key in PEM format for cryptographic request signing | Optional (required only for trade execution) |
+| `PORT` | Web server port | Default: `7860` |
+
+See `.env.example` and `gmgn_private.pem.example` for reference templates. All private keys and local credentials are strictly gitignored following DevSecOps standards.
+
+---
+
 ## License
 
 Released under the MIT License.

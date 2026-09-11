@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+dist
+.env
+.env.*
+*.pem
+*.key
+.aider*
+.aider
+scripts/research

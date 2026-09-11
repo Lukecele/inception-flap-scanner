@@ -174,7 +174,7 @@ const flapProxy = () => ({
         }
 
         const client = new OpenApiClient({
-          apiKey: 'gmgn_6c719521eb31032ca2ecf471b0143fab',
+          apiKey: process.env.GMGN_API_KEY || 'gmgn_6c719521eb31032ca2ecf471b0143fab',
           host: 'https://openapi.gmgn.ai'
         });
         const apiRes = await client.getTrenches('bsc', ['new_creation', 'near_completion'], ['flap'], 80);
@@ -317,10 +317,23 @@ const flapProxy = () => ({
       const cleanTokenIn = tokenIn.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? '0x0000000000000000000000000000000000000000' : tokenIn;
       const cleanTokenOut = tokenOut.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? '0x0000000000000000000000000000000000000000' : tokenOut;
 
-      const apiKey = 'gmgn_6c719521eb31032ca2ecf471b0143fab';
-      let privateKeyPem;
-      try { privateKeyPem = fs.readFileSync('./gmgn_private.pem', 'utf8'); } catch (e) {
-        res.statusCode = 500; res.end(JSON.stringify({ error: 'Private key file missing' })); return;
+      const apiKey = process.env.GMGN_API_KEY || 'gmgn_6c719521eb31032ca2ecf471b0143fab';
+      let privateKeyPem = process.env.GMGN_PRIVATE_KEY;
+      if (!privateKeyPem) {
+        try {
+          if (fs.existsSync('./gmgn_private.pem')) {
+            privateKeyPem = fs.readFileSync('./gmgn_private.pem', 'utf8');
+          }
+        } catch (e) {}
+      }
+
+      if (!privateKeyPem) {
+        res.statusCode = 503;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          error: 'GMGN signature authentication unavailable. Set GMGN_PRIVATE_KEY in environment variables or provide local gmgn_private.pem.'
+        }));
+        return;
       }
 
       const timestamp = Math.floor(Date.now() / 1000);

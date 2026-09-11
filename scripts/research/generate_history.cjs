@@ -4,7 +4,7 @@ const fs = require('fs');
 async function generateHistory() {
   console.log("Fetching historical tokens from GMGN API...");
   const client = new OpenApiClient({
-    apiKey: 'gmgn_6c719521eb31032ca2ecf471b0143fab',
+    apiKey: process.env.GMGN_API_KEY || '',
     host: 'https://openapi.gmgn.ai'
   });
 

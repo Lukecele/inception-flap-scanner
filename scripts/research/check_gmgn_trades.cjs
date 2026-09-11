@@ -2,7 +2,7 @@ const { OpenApiClient } = require('/home/luca/.nvm/versions/node/v22.22.1/lib/no
 
 async function main() {
   const client = new OpenApiClient({
-    apiKey: 'gmgn_6c719521eb31032ca2ecf471b0143fab',
+    apiKey: process.env.GMGN_API_KEY || '',
     host: 'https://openapi.gmgn.ai'
   });
   

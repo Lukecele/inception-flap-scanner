@@ -1,3 +1,13 @@
+# Secrets & Credentials
+.env
+.env.*
+!.env.example
+*.pem
+!*.pem.example
+*.key
+*.crt
+*.cert
+
 # Logs
 logs
 *.log
@@ -7,12 +17,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build outputs
 node_modules
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Editor directories and OS files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,3 +34,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# AI tools cache
+.aider*
+.aider
