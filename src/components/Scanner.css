@@ -245,3 +245,118 @@
   letter-spacing: 0.5px;
   font-family: 'Courier New', monospace;
 }
+
+/* === Responsive Scanner === */
+@media (max-width: 768px) {
+  .scanner-status {
+    padding: 0.45rem 0.65rem;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.6rem;
+  }
+  .scanner-status > span.font-mono {
+    font-size: 0.68rem;
+  }
+  .filter-badge {
+    font-size: 0.62rem;
+    padding: 0.12rem 0.45rem;
+  }
+  .reset-list-btn {
+    margin-left: auto;
+    font-size: 0.62rem;
+    padding: 0.12rem 0.5rem;
+  }
+  .scanner-status .ml-auto {
+    display: none;
+  }
+
+  .token-list {
+    padding: 0.45rem 0.35rem;
+  }
+
+  .card-header {
+    padding: 0.45rem 0.65rem;
+    gap: 0.4rem;
+  }
+  .token-logo {
+    width: 26px;
+    height: 26px;
+  }
+  .token-name {
+    font-size: 0.78rem;
+    max-width: 140px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+  .token-symbol {
+    font-size: 0.7rem;
+  }
+  .token-addr {
+    font-size: 0.6rem;
+  }
+  .timestamp-badge {
+    font-size: 0.58rem;
+  }
+  .tx-link {
+    font-size: 0.65rem;
+  }
+
+  .phases-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+  }
+  .phase-box {
+    padding: 0.45rem 0.55rem;
+    min-width: 0;
+    overflow: hidden;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .phases-grid > .phase-box:last-child {
+    grid-column: span 2;
+  }
+  .phase-title {
+    font-size: 0.58rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .scanner-status {
+    padding: 0.35rem 0.5rem;
+  }
+  .token-list {
+    padding: 0.35rem 0.25rem;
+  }
+  .token-name {
+    max-width: 105px;
+  }
+  .phase-box {
+    padding: 0.4rem 0.45rem;
+  }
+  .phase-title {
+    font-size: 0.54rem;
+    letter-spacing: 0.4px;
+  }
+  .badge-link {
+    padding: 0.12rem 0.32rem;
+    font-size: 0.58rem;
+  }
+  .chip-link {
+    padding: 0.12rem 0.35rem;
+    font-size: 0.58rem;
+  }
+  .card-action-bar {
+    padding: 0.35rem 0.5rem;
+  }
+  .action-text {
+    font-size: 0.58rem;
+    letter-spacing: 0.2px;
+    line-height: 1.3;
+    display: block;
+    word-break: break-word;
+  }
+}
+

@@ -452,29 +452,134 @@
 .spin-icon { animation: spin 1s linear infinite; }
 
 /* === Responsive === */
-@media (max-width: 900px) {
-  .modal-body-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
+@media (max-width: 860px) {
+  .detail-modal-overlay {
+    padding: 0;
   }
-  .modal-chart-column {
-    border-right: none;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    max-height: 55vh;
-  }
-  .modal-trading-column {
-    max-height: 45vh;
-  }
-  .chart-iframe { height: 260px; }
-}
 
-@media (max-width: 600px) {
   .detail-modal-card {
     height: 100dvh;
     max-height: 100dvh;
     border-radius: 0;
+    border: none;
   }
-  .modal-tab-selector { gap: 3px; padding: 0.5rem 0.6rem 0.4rem; }
-  .tab-btn { font-size: 0.6rem; padding: 4px 6px; }
-  .close-btn span { display: none; }
+
+  .modal-header {
+    padding: 0.5rem 0.75rem;
+    min-height: 52px;
+  }
+
+  .modal-token-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .modal-header-left h2 {
+    font-size: 0.92rem;
+  }
+
+  .modal-token-addr {
+    font-size: 0.58rem;
+  }
+
+  .close-btn {
+    padding: 0.3rem 0.55rem;
+  }
+
+  .modal-body-grid {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100dvh - 52px);
+  }
+
+  .modal-chart-column {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    height: auto;
+    max-height: none;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+
+  .modal-tab-selector {
+    padding: 0.45rem 0.65rem;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    font-size: 0.62rem;
+    padding: 4px 7px;
+  }
+
+  .chart-area {
+    padding: 0.6rem;
+    height: auto;
+    min-height: unset;
+    overflow: visible;
+  }
+
+  .chart-iframe {
+    height: 280px;
+    max-height: 340px;
+  }
+
+  .holders-tab-content,
+  .traders-tab-content {
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .modal-trading-column {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    flex-shrink: 0;
+    padding: 0.6rem;
+    gap: 0.6rem;
+  }
+
+  .modal-box {
+    padding: 0.65rem;
+  }
+
+  .metrics-grid > div {
+    font-size: 0.66rem;
+  }
+
+  .amount-input, .slippage-input {
+    font-size: 0.8rem;
+  }
+
+  .quick-presets button {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.4rem;
+  }
 }
+
+@media (max-width: 480px) {
+  .modal-header-left h2 {
+    font-size: 0.82rem;
+    max-width: 160px;
+  }
+
+  .close-btn span {
+    display: none;
+  }
+
+  .chart-iframe {
+    height: 240px;
+  }
+
+  .tab-btn {
+    font-size: 0.58rem;
+    padding: 3px 6px;
+  }
+
+  .wallet-info span {
+    font-size: 0.58rem;
+  }
+}
+

@@ -99,3 +99,44 @@ body {
 .border-cyan { border-color: var(--accent-cyan); }
 .border-red { border-color: var(--accent-red); }
 .border-green { border-color: var(--accent-green); }
+
+/* === Main App Responsive Layout === */
+.app-container {
+  padding: 1.5rem 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.app-content {
+  flex: 1;
+  min-height: 0;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.6rem 0.5rem;
+    height: auto;
+    min-height: 100dvh;
+  }
+  .app-content {
+    margin-top: 0.4rem;
+    min-height: calc(100dvh - 130px);
+  }
+}
+
+@media (max-width: 420px) {
+  .app-container {
+    padding: 0.4rem 0.3rem;
+  }
+  .app-content {
+    margin-top: 0.25rem;
+  }
+}
+

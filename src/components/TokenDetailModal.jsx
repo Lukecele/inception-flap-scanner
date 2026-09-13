@@ -86,7 +86,7 @@ const TokenDetailModal = ({ token, onClose }) => {
   }, [token.tokenAddress, poolAddress]);
 
   const addLog = useCallback((msg) => {
-    setStatusLogs(prev => [...prev, `[${new Date().toLocaleTimeString('it-IT')}] ${msg}`]);
+    setStatusLogs(prev => [...prev, `[${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}] ${msg}`]);
   }, []);
 
   useEffect(() => {
@@ -115,7 +115,7 @@ const TokenDetailModal = ({ token, onClose }) => {
       setBnbBalance((Number(BigInt(hexBal)) / 1e18).toFixed(4));
       const tokBal = await getERC20Balance(token.tokenAddress, addr);
       setUserTokenBalance(tokBal);
-    } catch (e) { addLog(`🚨 Errore saldo: ${e.message}`); }
+    } catch (e) { addLog(`🚨 Balance error: ${e.message}`); }
   }, [token.tokenAddress, addLog]);
 
   useEffect(() => {
@@ -171,7 +171,7 @@ const TokenDetailModal = ({ token, onClose }) => {
           const raw = parseFloat(String(buyAmount).replace(',', '.').trim());
           if (!raw || raw <= 0 || isNaN(raw)) {
             setLoadingQuote(false);
-            setQuoteError('Inserisci un importo BNB valido');
+            setQuoteError('Enter a valid BNB amount');
             return;
           }
           inputToken  = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
@@ -180,7 +180,7 @@ const TokenDetailModal = ({ token, onClose }) => {
         } else {
           if (userTokenBalance === 0n) {
             setLoadingQuote(false);
-            setQuoteError('Nessun token in portafoglio');
+            setQuoteError('No tokens in wallet');
             return;
           }
           const sellWei = (userTokenBalance * BigInt(sellPercent)) / 100n;
@@ -194,7 +194,7 @@ const TokenDetailModal = ({ token, onClose }) => {
         const d = await r.json();
 
         if (d?.code === 'CF_BLOCKED') {
-          setQuoteError('GMGN bloccato (Cloudflare) — preventivo non calcolabile');
+          setQuoteError('GMGN blocked (Cloudflare) — quote unavailable');
           setLoadingQuote(false);
           return;
         }
@@ -206,10 +206,10 @@ const TokenDetailModal = ({ token, onClose }) => {
             : `~${outNum.toFixed(5)} BNB`
           );
         } else {
-          setQuoteError(d?.msg || d?.error || 'Route non disponibile');
+          setQuoteError(d?.msg || d?.error || 'Route unavailable');
         }
       } catch (e) {
-        setQuoteError(`Errore preventivo: ${e.message}`);
+        setQuoteError(`Quote error: ${e.message}`);
       }
       setLoadingQuote(false);
     };
@@ -387,9 +387,9 @@ const TokenDetailModal = ({ token, onClose }) => {
   }, [activeTab, poolAddress, fetchTrades]);
 
   const connectWallet = async () => {
-    if (!window.ethereum) { alert('Installa MetaMask per fare trading!'); return; }
+    if (!window.ethereum) { alert('Please install MetaMask to trade!'); return; }
     try {
-      addLog('Connessione wallet…');
+      addLog('Connecting wallet…');
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       if (accounts.length > 0) {
         setWalletConnected(true);
@@ -409,13 +409,13 @@ const TokenDetailModal = ({ token, onClose }) => {
 
     try {
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if (chainId !== '0x38') throw new Error(`Passa a BSC (BNB Chain) in MetaMask!`);
+      if (chainId !== '0x38') throw new Error(`Please switch to BSC (BNB Chain) in MetaMask!`);
 
       if (tradeType === 'buy') {
         const raw = parseFloat(String(buyAmount).replace(',', '.').trim());
-        if (!raw || isNaN(raw) || raw <= 0) throw new Error('Importo BNB non valido');
+        if (!raw || isNaN(raw) || raw <= 0) throw new Error('Invalid BNB amount');
         const bnb = parseFloat(bnbBalance);
-        if (raw > bnb - 0.002) throw new Error(`Saldo insufficiente`);
+        if (raw > bnb - 0.002) throw new Error(`Insufficient balance`);
 
         const DEV_FEE_ADDRESS = '0xafF5340ECFaf7ce049261cff193f5FED6BDF04E7';
         const DEV_FEE_PERCENT = 0.01;
@@ -424,17 +424,17 @@ const TokenDetailModal = ({ token, onClose }) => {
         const swapWei = BigInt(Math.round(swapAmount * 1e18));
         const feeWei = BigInt(Math.round(feeAmount * 1e18));
 
-        addLog(`1. Recupero route per ${swapAmount.toFixed(5)} BNB…`);
+        addLog(`1. Fetching route for ${swapAmount.toFixed(5)} BNB…`);
         const routeRes = await fetch(`/api/gmgn/swap-route?chain=bsc&from=${walletAddress}&input_token=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&output_token=${token.tokenAddress}&amount=${swapWei.toString()}&slippage=${slippage}`);
         const routeData = await routeRes.json();
 
         if (routeData?.code === 'CF_BLOCKED' || !routeData?.data?.raw_tx) {
           if (token.launchpadProgress < 1) {
-            addLog(`⚠️ Token ancora su Flap Bonding Curve. Apro Flap.sh…`);
+            addLog(`⚠️ Token still on Flap bonding curve. Opening Flap.sh…`);
             window.open(`https://flap.sh/bnb/${token.tokenAddress}`, '_blank');
             return;
           }
-          throw new Error(routeData?.error || 'Nessuna route disponibile');
+          throw new Error(routeData?.error || 'No route available');
         }
 
         const rt = routeData.data.raw_tx;
@@ -443,7 +443,7 @@ const TokenDetailModal = ({ token, onClose }) => {
           method: 'eth_sendTransaction',
           params: [{ from: walletAddress, to: rt.to, data: rt.data, value: txValue, ...(rt.gas_limit ? { gas: '0x' + BigInt(rt.gas_limit).toString(16) } : {}) }]
         });
-        addLog(`✅ TX acquisto inviata! Hash: ${txHash}`);
+        addLog(`✅ Buy TX sent! Hash: ${txHash}`);
 
         let receipt = null;
         for (let i = 0; i < 40; i++) {
@@ -451,8 +451,8 @@ const TokenDetailModal = ({ token, onClose }) => {
           if (receipt) break;
           await new Promise(ok => setTimeout(ok, 2000));
         }
-        if (!receipt || receipt.status === '0x0') throw new Error('Acquisto fallito su blockchain.');
-        addLog(`🎉 Acquisto confermato con successo!`);
+        if (!receipt || receipt.status === '0x0') throw new Error('Buy transaction failed on-chain.');
+        addLog(`🎉 Buy confirmed successfully!`);
         await updateBalances(walletAddress);
 
         if (feeWei > 0n) {
@@ -461,41 +461,41 @@ const TokenDetailModal = ({ token, onClose }) => {
               method: 'eth_sendTransaction',
               params: [{ from: walletAddress, to: DEV_FEE_ADDRESS, value: '0x' + feeWei.toString(16) }]
             });
-            addLog(`✅ Dev fee inviata! Hash: ${feeTxHash}`);
+            addLog(`✅ Dev fee sent! Hash: ${feeTxHash}`);
           } catch (_) {}
         }
       } else {
         const tokenBal = await getERC20Balance(token.tokenAddress, walletAddress);
-        if (tokenBal === 0n) throw new Error(`Non hai ${token.tokenSymbol} in portafoglio`);
+        if (tokenBal === 0n) throw new Error(`You have no ${token.tokenSymbol} in your wallet`);
         const DEV_FEE_ADDRESS = '0xafF5340ECFaf7ce049261cff193f5FED6BDF04E7';
         const DEV_FEE_PERCENT = 0.01;
         const sellAmt = (tokenBal * BigInt(sellPercent)) / 100n;
 
-        addLog(`1. Recupero route sell ${sellPercent}% dei tuoi ${token.tokenSymbol}…`);
+        addLog(`1. Fetching sell route for ${sellPercent}% of your ${token.tokenSymbol}…`);
         const routeRes = await fetch(`/api/gmgn/swap-route?chain=bsc&from=${walletAddress}&input_token=${token.tokenAddress}&output_token=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&amount=${sellAmt.toString()}&slippage=${slippage}`);
         const routeData = await routeRes.json();
 
         if (routeData?.code === 'CF_BLOCKED' || !routeData?.data?.raw_tx) {
           if (token.launchpadProgress < 1) {
-            addLog(`⚠️ Token su Flap Curve. Apro Flap.sh per vendere…`);
+            addLog(`⚠️ Token on Flap curve. Opening Flap.sh to sell…`);
             window.open(`https://flap.sh/bnb/${token.tokenAddress}`, '_blank');
             return;
           }
-          throw new Error(routeData?.error || 'Nessuna sell route');
+          throw new Error(routeData?.error || 'No sell route found');
         }
 
         const rt = routeData.data.raw_tx;
-        addLog(`2. Approvazione token per router…`);
+        addLog(`2. Approving token for router…`);
         const approveData = '0x095ea7b3' + rt.to.toLowerCase().replace('0x', '').padStart(64, '0') + sellAmt.toString(16).padStart(64, '0');
         const approveTxHash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: walletAddress, to: token.tokenAddress, data: approveData }] });
 
         for (let i = 0; i < 40; i++) {
           const r = await window.ethereum.request({ method: 'eth_getTransactionReceipt', params: [approveTxHash] });
-          if (r) { if (r.status === '0x0') throw new Error('Approvazione fallita.'); break; }
+          if (r) { if (r.status === '0x0') throw new Error('Approval failed.'); break; }
           await new Promise(ok => setTimeout(ok, 2000));
         }
 
-        addLog(`✅ Approvato. Firma swap vendita…`);
+        addLog(`✅ Approved. Signing sell swap…`);
         const sellValue = rt.value ? (rt.value.startsWith('0x') ? rt.value : '0x' + BigInt(rt.value).toString(16)) : '0x0';
         const swapTxHash = await window.ethereum.request({
           method: 'eth_sendTransaction',
@@ -508,8 +508,8 @@ const TokenDetailModal = ({ token, onClose }) => {
           if (swapReceipt) break;
           await new Promise(ok => setTimeout(ok, 2000));
         }
-        if (!swapReceipt || swapReceipt.status === '0x0') throw new Error('Vendita fallita.');
-        addLog(`🎉 Vendita confermata con successo!`);
+        if (!swapReceipt || swapReceipt.status === '0x0') throw new Error('Sell failed on-chain.');
+        addLog(`🎉 Sell confirmed successfully!`);
         await updateBalances(walletAddress);
 
         const quote = routeData.data.quote;
@@ -524,7 +524,7 @@ const TokenDetailModal = ({ token, onClose }) => {
         }
       }
     } catch (e) {
-      if (e.code === 4001) addLog('❌ Transazione rifiutata dall\'utente');
+      if (e.code === 4001) addLog('❌ Transaction rejected by user');
       else addLog(`🚨 ${e.message}`);
     } finally {
       tradingRef.current = false;
@@ -605,7 +605,7 @@ const TokenDetailModal = ({ token, onClose }) => {
             </div>
           </div>
           <button className="close-btn" onClick={onClose} style={{ marginLeft: '1rem', flexShrink: 0 }}>
-            <X size={14} /><span style={{ fontSize: '0.7rem', fontWeight: 800 }}>INDIETRO</span>
+            <X size={14} /><span style={{ fontSize: '0.7rem', fontWeight: 800 }}>CLOSE</span>
           </button>
         </div>
 
@@ -613,8 +613,8 @@ const TokenDetailModal = ({ token, onClose }) => {
           <div className="modal-chart-column" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div className="modal-tab-selector" style={{ flexShrink: 0 }}>
               {[
-                { id: 'chart',   label: '📈 GRAFICO' },
-                { id: 'trades',  label: '⚡ TXS LIVE' },
+                { id: 'chart',   label: '📈 CHART' },
+                { id: 'trades',  label: '⚡ LIVE TRADES' },
                 { id: 'holders', label: '👥 HOLDERS' },
                 { id: 'traders', label: '📊 TRADERS' },
               ].map(({ id, label }) => (
@@ -644,26 +644,26 @@ const TokenDetailModal = ({ token, onClose }) => {
               <div className="chart-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '400px', gap: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexShrink: 0 }}>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    {poolAddress ? `Pool: ${poolAddress.slice(0,10)}…` : 'Pool non rilevato (token su bonding curve)'}
+                    {poolAddress ? `Pool: ${poolAddress.slice(0,10)}…` : 'Pool not detected (token on bonding curve)'}
                   </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     {loadingTrades && <RefreshCw size={11} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent-cyan)' }} />}
-                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Aggiornamento ottimizzato</span>
+                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Live polling</span>
                   </div>
                 </div>
 
                 {loadingTrades && liveTrades.length === 0 ? (
-                  <Spinner msg="Caricamento transazioni on-chain…" />
+                  <Spinner msg="Loading on-chain transactions…" />
                 ) : liveTrades.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                    <span>Nessuna transazione recente trovata su questa bonding curve.</span>
+                    <span>No recent transactions found on this bonding curve.</span>
                   </div>
                 ) : (
                   <div style={{ overflowY: 'auto', flex: 1, maxHeight: '380px' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', fontSize: '0.64rem', color: 'var(--text-muted)', position: 'sticky', top: 0, background: '#0b0c10' }}>
-                          <th style={{ padding: '5px 6px', textAlign: 'left', fontWeight: 700 }}>Tipo</th>
+                          <th style={{ padding: '5px 6px', textAlign: 'left', fontWeight: 700 }}>Type</th>
                           <th style={{ padding: '5px 6px', textAlign: 'left', fontWeight: 700 }}>Wallet</th>
                           <th style={{ padding: '5px 6px', textAlign: 'right', fontWeight: 700 }}>Token</th>
                           <th style={{ padding: '5px 6px', textAlign: 'right', fontWeight: 700 }}>BNB</th>
@@ -705,12 +705,12 @@ const TokenDetailModal = ({ token, onClose }) => {
 
             {activeTab === 'holders' && (
               <div className="holders-tab-content" style={{ flex: 1, overflowY: 'auto', maxHeight: '420px' }}>
-                {loadingHolders ? <Spinner msg="Caricamento Top Holders da GMGN…" /> : (
+                {loadingHolders ? <Spinner msg="Loading Top Holders from GMGN…" /> : (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <TableHead5 cols={['Wallet', 'Tag', 'Bilancio', '%', 'P/L BNB']} />
+                    <TableHead5 cols={['Wallet', 'Tag', 'Balance', '%', 'P/L BNB']} />
                     <tbody>
                       {holders.length === 0
-                        ? <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.72rem' }}>Nessun dato JSON valido ricevuto</td></tr>
+                        ? <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.72rem' }}>No holder data available</td></tr>
                         : holders.map((h, i) => <HolderRow key={i} item={h} idx={i} />)
                       }
                     </tbody>
@@ -721,12 +721,12 @@ const TokenDetailModal = ({ token, onClose }) => {
 
             {activeTab === 'traders' && (
               <div className="traders-tab-content" style={{ flex: 1, overflowY: 'auto', maxHeight: '420px' }}>
-                {loadingTraders ? <Spinner msg="Caricamento Top Traders da GMGN…" /> : (
+                {loadingTraders ? <Spinner msg="Loading Top Traders from GMGN…" /> : (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <TableHead5 cols={['Wallet', 'Tag', 'Bilancio', '%', 'P/L BNB']} />
+                    <TableHead5 cols={['Wallet', 'Tag', 'Balance', '%', 'P/L BNB']} />
                     <tbody>
                       {traders.length === 0
-                        ? <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.72rem' }}>Nessun dato JSON valido ricevuto</td></tr>
+                        ? <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.72rem' }}>No trader data available</td></tr>
                         : traders.map((h, i) => <HolderRow key={i} item={h} idx={i} />)
                       }
                     </tbody>
@@ -738,16 +738,16 @@ const TokenDetailModal = ({ token, onClose }) => {
 
           <div className="modal-trading-column">
             <div className="modal-box">
-              <h3 className="box-title text-cyan"><Activity size={12} style={{ marginRight: 5 }} />METRICHE</h3>
+              <h3 className="box-title text-cyan"><Activity size={12} style={{ marginRight: 5 }} />METRICS</h3>
               <div className="metrics-grid">
-                <div><span className="label">Tasse B/S:</span>
+                <div><span className="label">Taxes B/S:</span>
                   <span className={`val font-bold ${token.isHighTax ? 'text-red' : 'text-green'}`}>
                     {token.taxKnown ? `${(token.buyTax||0).toFixed(1)}% / ${(token.sellTax||0).toFixed(1)}%` : '–'}
                   </span>
                 </div>
                 <div><span className="label">Honeypot:</span>
                   <span className={`val font-bold ${token.isHoneypot ? 'text-red' : 'text-green'}`}>
-                    {token.isHoneypot ? '🚨 SÌ' : '✅ No'}
+                    {token.isHoneypot ? '🚨 YES' : '✅ No'}
                   </span>
                 </div>
                 <div><span className="label">Smart Money:</span><span className="val font-bold">{token.smartMoneyCount || 0}</span></div>
@@ -758,7 +758,7 @@ const TokenDetailModal = ({ token, onClose }) => {
                     {token.liquidityUsd ? `$${parseFloat(token.liquidityUsd).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '–'}
                   </span>
                 </div>
-                <div><span className="label">Lanci Dev:</span>
+                <div><span className="label">Dev Launches:</span>
                   <span className={`val font-bold ${(token.creatorCreatedCount||0) > 5 ? 'text-red' : 'text-green'}`}>
                     {token.creatorCreatedCount || 0}
                   </span>
@@ -771,7 +771,7 @@ const TokenDetailModal = ({ token, onClose }) => {
                 </div>
                 {token.launchpadProgress !== undefined && (
                   <div style={{ gridColumn: 'span 2', marginTop: 4 }}>
-                    <span className="label" style={{ display: 'block', marginBottom: 3 }}>Curva Bonding Flap:</span>
+                    <span className="label" style={{ display: 'block', marginBottom: 3 }}>Flap Bonding Curve:</span>
                     <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 3, height: 5, overflow: 'hidden' }}>
                       <div style={{ background: token.launchpadProgress >= 1 ? 'var(--accent-green)' : 'var(--accent-cyan)', width: `${Math.min(100, (token.launchpadProgress||0)*100)}%`, height: '100%', transition: 'width 0.4s' }} />
                     </div>
@@ -788,14 +788,14 @@ const TokenDetailModal = ({ token, onClose }) => {
               <h3 className="box-title text-purple"><Wallet size={12} style={{ marginRight: 5 }} />FAST SWAP</h3>
               <div className="wallet-status-bar">
                 {!walletConnected
-                  ? <button className="connect-wallet-btn" onClick={connectWallet}><Wallet size={12} /> Connetti Wallet</button>
+                  ? <button className="connect-wallet-btn" onClick={connectWallet}><Wallet size={12} /> Connect Wallet</button>
                   : <div className="wallet-info" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontFamily: 'monospace', fontSize: '0.66rem', color: 'var(--text-muted)' }}>
                           {walletAddress.slice(0,6)}…{walletAddress.slice(-4)}
                         </span>
                         <button onClick={() => { setWalletConnected(false); setWalletAddress(''); setBnbBalance('0.0000'); setUserTokenBalance(0n); }} style={{ background: 'none', border: 'none', color: 'var(--accent-red)', fontSize: '0.58rem', cursor: 'pointer', padding: 0, textAlign: 'left', textDecoration: 'underline', marginTop: '2px', fontWeight: 800 }}>
-                          SCONNETTI
+                          DISCONNECT
                         </button>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -809,13 +809,13 @@ const TokenDetailModal = ({ token, onClose }) => {
               </div>
 
               <div className="trade-type-tabs">
-                <button className={`type-tab buy-tab${tradeType==='buy'?' active':''}`} onClick={() => setTradeType('buy')}>🟢 COMPRA</button>
-                <button className={`type-tab sell-tab${tradeType==='sell'?' active':''}`} onClick={() => setTradeType('sell')}>🔴 VENDI</button>
+                <button className={`type-tab buy-tab${tradeType==='buy'?' active':''}`} onClick={() => setTradeType('buy')}>🟢 BUY</button>
+                <button className={`type-tab sell-tab${tradeType==='sell'?' active':''}`} onClick={() => setTradeType('sell')}>🔴 SELL</button>
               </div>
 
               {tradeType === 'buy' && (
                 <div className="input-panel">
-                  <span className="label">Importo BNB:</span>
+                  <span className="label">BNB Amount:</span>
                   <div className="input-row">
                     <input type="number" inputMode="decimal" min="0" step="0.01" value={buyAmount} onChange={e => setBuyAmount(e.target.value)} placeholder="0.1" className="amount-input" style={{ paddingRight: '2.8rem' }} />
                     <span className="unit">BNB</span>
@@ -831,7 +831,7 @@ const TokenDetailModal = ({ token, onClose }) => {
               {tradeType === 'sell' && (
                 <div className="input-panel">
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span className="label">Percentuale:</span>
+                    <span className="label">Percentage:</span>
                     <span style={{ fontFamily: 'monospace', fontSize: '0.62rem', color: 'var(--accent-cyan)' }}>
                       {(Number(userTokenBalance)/1e18).toLocaleString('en-US',{maximumFractionDigits:0})} {token.tokenSymbol}
                     </span>
@@ -842,18 +842,18 @@ const TokenDetailModal = ({ token, onClose }) => {
                     ))}
                   </div>
                   <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 2, fontFamily: 'monospace' }}>
-                    Vendi: {(Number(userTokenBalance * BigInt(sellPercent) / 100n)/1e18).toLocaleString('en-US',{maximumFractionDigits:0})} {token.tokenSymbol}
+                    Sell: {(Number(userTokenBalance * BigInt(sellPercent) / 100n)/1e18).toLocaleString('en-US',{maximumFractionDigits:0})} {token.tokenSymbol}
                   </div>
                 </div>
               )}
 
               <div className="quote-preview">
                 {!walletConnected
-                  ? <span>Connetti wallet per preventivo</span>
+                  ? <span>Connect wallet for quote</span>
                   : loadingQuote
-                    ? <span>⏳ Calcolo…</span>
+                    ? <span>⏳ Calculating…</span>
                     : quoteOut
-                      ? <span style={{ color: 'var(--accent-cyan)' }}>≈ Ricevi: <strong>{quoteOut}</strong></span>
+                      ? <span style={{ color: 'var(--accent-cyan)' }}>≈ You receive: <strong>{quoteOut}</strong></span>
                       : quoteError
                         ? <span style={{ color: 'var(--accent-red)', fontSize: '0.62rem' }}>{quoteError}</span>
                         : null
@@ -867,7 +867,7 @@ const TokenDetailModal = ({ token, onClose }) => {
 
               <button className={`swap-btn ${tradeType==='buy'?'buy-btn':'sell-btn'}${isTrading?' loading':''}`} onClick={executeMetaMaskTrade} disabled={isTrading}>
                 {isTrading && <RefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} />}
-                {isTrading ? 'IN CORSO…' : tradeType==='buy' ? '🟢 COMPRA ORA' : '🔴 VENDI ORA'}
+                {isTrading ? 'TRADING…' : tradeType==='buy' ? '🟢 BUY NOW' : '🔴 SELL NOW'}
               </button>
 
               {statusLogs.length > 0 && (

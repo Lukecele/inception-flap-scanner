@@ -104,7 +104,7 @@ const Scanner = () => {
     const tokenKey = addr.toLowerCase();
     const trueDev = rawToken.creator || "0x0000000000000000000000000000000000000000";
 
-    // ESCLUSIONE RADICALE: Se la tassa è > 9%, scarta il token prima di fare qualsiasi operazione
+    // STRICT EXCLUSION: If tax > 9%, discard token before running further operations
     if ((rawToken.buyTax && rawToken.buyTax > 9) || (rawToken.sellTax && rawToken.sellTax > 9)) {
       return;
     }
@@ -117,20 +117,20 @@ const Scanner = () => {
     let cloneWarning = null;
     if (hasSocialClone) {
       cloneWarning = (tgCloneOf === '0x_famous_project_copycat' || xCloneOf === '0x_famous_project_copycat')
-        ? `🚨 COPIA DI PROGETTO FAMOSO (TRAPPA)!`
-        : `🚨 Social clonato da ${ (tgCloneOf || xCloneOf || webCloneOf).slice(0, 10) }...`;
+        ? `🚨 FAMOUS PROJECT CLONE (TRAP)!`
+        : `🚨 Socials cloned from ${ (tgCloneOf || xCloneOf || webCloneOf).slice(0, 10) }...`;
     }
 
     let enrichedToken = {
       ...rawToken,
-      taxInnovation: "Analisi contratto...",
-      devClusterHistory: "Analisi BscScan...",
+      taxInnovation: "Analyzing contract...",
+      devClusterHistory: "Analyzing BscScan...",
       pastScamsCount: 0,
       funderText: "",
       hasSocialClone,
       cloneWarning,
-      webStatus: rawToken.isStealth ? "Nessun social pubblico" : (cloneWarning || "✅ Social verificati"),
-      timestamp: new Date().toLocaleTimeString('it-IT')
+      webStatus: rawToken.isStealth ? "No public socials" : (cloneWarning || "✅ Verified socials"),
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     };
 
     setTokens(prev => {
@@ -138,26 +138,26 @@ const Scanner = () => {
       return [enrichedToken, ...prev].slice(0, 100);
     });
 
-    // FASE 3 · TAX IMPL
-    let taxInnovation = "Standard (Nessuna Tassa)";
+    // PHASE 3 · TAX IMPL
+    let taxInnovation = "Standard (No Tax)";
     if (rawToken.buyTax > 0 || rawToken.sellTax > 0) {
-      taxInnovation = "Lettura contratto non disponibile";
+      taxInnovation = "Contract read unavailable";
       const code = await safeCall(p => p.getCode(addr));
       if (code && code.startsWith("0x363d3d373d3d3d363d73")) {
         const impl = "0x" + code.slice(22, 62).toLowerCase();
         if (STANDARD_IMPLS.includes(impl)) {
-          taxInnovation = `🔁 Proxy Standard Flap (${impl.slice(0, 10)}...)`;
+          taxInnovation = `🔁 Standard Flap Proxy (${impl.slice(0, 10)}...)`;
         } else {
           implSeenCount[impl] = (implSeenCount[impl] || 0) + 1;
-          taxInnovation = `🆕 Proxy Custom Flap (${impl.slice(0, 10)}...) — Sospetto!`;
+          taxInnovation = `🆕 Custom Flap Proxy (${impl.slice(0, 10)}...) — Suspicious!`;
         }
       } else if (code && code.length > 10) {
-        taxInnovation = "🚀 Contratto nativo — Innovazione Totale!";
+        taxInnovation = "🚀 Native Contract — Clean Deployment";
       }
     }
 
-    // FASE 4 · DEV CLUSTERING
-    let devClusterHistory = "Analisi dev non disponibile";
+    // PHASE 4 · DEV CLUSTERING
+    let devClusterHistory = "Dev analysis unavailable";
     let funderText = "";
     let pastScamsCount = 0;
     let bscScanSuccess = false;
@@ -174,11 +174,11 @@ const Scanner = () => {
               devClusterHistory = "✅ Funder: Exchange/Bridge";
               funderText = `${funder.slice(0, 10)}...`;
             } else if (cnt > 20) {
-              devClusterHistory = `🚨 Funder sospetto (${cnt} txs)`;
+              devClusterHistory = `🚨 Suspicious funder (${cnt} txs)`;
               pastScamsCount = cnt;
-              funderText = `Cluster scam: ${funder.slice(0, 10)}...`;
+              funderText = `Scam cluster: ${funder.slice(0, 10)}...`;
             } else {
-              devClusterHistory = `✅ Wallet privato (${cnt} txs)`;
+              devClusterHistory = `✅ Private wallet (${cnt} txs)`;
               funderText = `${funder.slice(0, 10)}...`;
             }
             bscScanSuccess = true;
@@ -191,7 +191,7 @@ const Scanner = () => {
       try {
         const cnt = await safeCall(p => p.getTransactionCount(trueDev));
         if (cnt !== null && cnt !== undefined) {
-          devClusterHistory = cnt > 10 ? `🚨 Dev seriale (${cnt} TX)` : `✅ Dev nuovo (${cnt} TX)`;
+          devClusterHistory = cnt > 10 ? `🚨 Serial deployer (${cnt} TX)` : `✅ New deployer (${cnt} TX)`;
           pastScamsCount = cnt > 10 ? cnt : 0;
         }
       } catch (_) {}
@@ -199,7 +199,7 @@ const Scanner = () => {
 
     setTokens(prev => prev.map(t => {
       if (t.tokenAddress?.toLowerCase() === tokenKey) {
-        const webStatus = t.isStealth ? "Nessun social pubblico" : (cloneWarning || "✅ Social verificati");
+        const webStatus = t.isStealth ? "No public socials" : (cloneWarning || "✅ Verified socials");
         return {
           ...t,
           taxInnovation,
@@ -263,12 +263,12 @@ const Scanner = () => {
       <div className="scanner-status">
         <div className={`status-dot ${isConnected ? 'active' : 'inactive'}`}></div>
         <span className="font-mono text-sm text-bright">
-          {isConnected ? 'LIVE — GMGN STREAM (EXCLUDING TAX > 9%)' : 'CONNESSIONE STREAM...'}
+          {isConnected ? 'LIVE — GMGN STREAM (EXCLUDING TAX > 9%)' : 'CONNECTING STREAM...'}
         </span>
         <div className="filter-badge"><Zap size={11} className="mr-1 inline-icon"/>CENTAUR SCANNER</div>
         <button 
           onClick={() => {
-            if (confirm("Vuoi resettare la memoria dei token e ricaricare il feed?")) {
+            if (confirm("Reset token cache and reload live feed?")) {
               processedTokens.current = new Set();
               setTokens([]);
               fetchLiveLaunches();
@@ -285,12 +285,12 @@ const Scanner = () => {
         {validTokens.length === 0 ? (
           <div className="empty-state font-mono text-muted">
             <Activity size={28} className="mb-2 opacity-50 pulse-icon text-cyan" />
-            <p>In ascolto sui nuovi lanci di Flap...</p>
+            <p>Listening for new Flap launches...</p>
           </div>
         ) : validTokens.map((token, idx) => {
           const isScrap = token.pastScamsCount > 20 || token.hasSocialClone || 
                           token.isHoneypot || token.taxInnovation?.includes('🆕 Proxy Custom');
-          const isPending = token.devClusterHistory === "Analisi BscScan...";
+          const isPending = token.devClusterHistory === "Analyzing BscScan...";
           const cardClass = isScrap ? 'card-rejected' : isPending ? 'card-pending' : 'card-passed';
           
           return (
@@ -322,11 +322,11 @@ const Scanner = () => {
 
               <div className="phases-grid">
                 <div className="phase-box">
-                  <div className="phase-title text-cyan"><Shield size={12} className="mr-1"/>FASE 1 · TAX</div>
+                  <div className="phase-title text-cyan"><Shield size={12} className="mr-1"/>PHASE 1 · TAX</div>
                   {token.isHoneypot ? (
                     <div className="text-red font-bold text-xs"><ShieldAlert size={11} className="inline-icon mr-1"/>🚨 HONEYPOT!</div>
                   ) : token.buyTax === null ? (
-                    <div className="text-yellow text-xs font-bold">⚠️ Calcolo in corso</div>
+                    <div className="text-yellow text-xs font-bold">⚠️ Calculating...</div>
                   ) : (
                     <div className="text-green font-bold text-xs">
                       <CheckCircle size={11} className="inline-icon mr-1"/>{token.buyTax}% buy / {token.sellTax}% sell
@@ -335,9 +335,9 @@ const Scanner = () => {
                 </div>
 
                 <div className="phase-box">
-                  <div className="phase-title text-purple"><Search size={12} className="mr-1"/>FASE 2 · SOCIAL</div>
+                  <div className="phase-title text-purple"><Search size={12} className="mr-1"/>PHASE 2 · SOCIAL</div>
                   {token.hasSocialClone ? (
-                    <div className="text-red font-bold text-xs mb-1"><ShieldAlert size={11} className="inline-icon mr-1"/>🚨 SOCIAL FALSI</div>
+                    <div className="text-red font-bold text-xs mb-1"><ShieldAlert size={11} className="inline-icon mr-1"/>🚨 CLONED SOCIALS</div>
                   ) : token.isStealth ? (
                     <div className="text-green font-bold text-xs mb-1"><Target size={11} className="inline-icon mr-1"/>STEALTH LAUNCH</div>
                   ) : (
@@ -353,7 +353,7 @@ const Scanner = () => {
                 </div>
 
                 <div className="phase-box">
-                  <div className="phase-title text-red"><Network size={12} className="mr-1"/>FASE 4 · DEV</div>
+                  <div className="phase-title text-red"><Network size={12} className="mr-1"/>PHASE 4 · DEV</div>
                   <a href={`https://gmgn.ai/bsc/address/${token.creator}`} target="_blank" rel="noreferrer" className="text-purple text-xs hover-underline font-mono" onClick={e => e.stopPropagation()}>
                     {token.creator?.slice(0,10)}...{token.creator?.slice(-4)} ↗
                   </a>
@@ -364,7 +364,7 @@ const Scanner = () => {
                 </div>
 
                 <div className="phase-box">
-                  <div className="phase-title text-yellow"><Activity size={12} className="mr-1"/>GMGN METRICHE</div>
+                  <div className="phase-title text-yellow"><Activity size={12} className="mr-1"/>GMGN METRICS</div>
                   <div className="text-xs text-muted leading-relaxed font-mono">
                     Smart: <span className="text-bright font-bold">{token.smartMoneyCount || 0}</span> · KOL: <span className="text-bright font-bold">{token.kolCount || 0}</span><br/>
                     Snip: <span className="text-bright font-bold">{token.sniperCount || 0}</span> · Prog: <span className="text-cyan font-bold">{token.launchpadProgress || 0}%</span><br/>
@@ -373,7 +373,7 @@ const Scanner = () => {
                 </div>
 
                 <div className="phase-box">
-                  <div className="phase-title text-bright"><Brain size={12} className="mr-1"/>FASE 3 · TAX IMPL</div>
+                  <div className="phase-title text-bright"><Brain size={12} className="mr-1"/>PHASE 3 · TAX IMPL</div>
                   <div className={`text-xs font-bold mb-2 ${
                     token.taxInnovation?.includes('🆕') || token.taxInnovation?.includes('🚀') ? 'text-cyan' :
                     token.taxInnovation?.includes('🔁') ? 'text-red' : 'text-yellow'
@@ -388,7 +388,7 @@ const Scanner = () => {
               
               <div className="card-action-bar">
                 <span className="action-text">
-                  {isPending ? '⏳ ACQUISIZIONE LOGICHE ANTI-SCAM DI PRECISONE...' : isScrap ? '🚨 ANOMALIA RILEVATA (VEDI ANALISI DETTAGLI)' : '🔍 ANALISI COMPLETATA — ABILITATO PER FAST SWAP'}
+                  {isPending ? '⏳ ACQUIRING ANTI-SCAM SECURITY TELEMETRY...' : isScrap ? '🚨 ANOMALY DETECTED (CHECK AUDIT DETAILS)' : '🔍 ANALYSIS COMPLETE — READY FOR FAST SWAP'}
                 </span>
               </div>
             </div>
