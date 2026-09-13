@@ -38,3 +38,4 @@ dist-ssr
 # AI tools cache
 .aider*
 .aider
+.env*.local
