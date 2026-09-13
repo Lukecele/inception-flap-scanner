@@ -55,7 +55,7 @@ const resolveGmgnCredentials = () => {
   }
 
   if (!apiKey) {
-    apiKey = 'gmgn_6c719521eb31032ca2ecf471b0143fab';
+    apiKey = '';
   }
 
   if (privateKeyPem) {

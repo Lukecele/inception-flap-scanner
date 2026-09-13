@@ -1,7 +1,12 @@
 {
   "name": "inception-flap-scanner",
-  "private": true,
   "version": "1.0.0",
+  "license": "MIT",
+  "author": "Lukecele",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lukecele/inception-flap-scanner.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,37 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  ArrowLeft, X, ExternalLink, Activity, 
-  Shield, ShieldAlert, CheckCircle, Copy, Check,
-  TrendingUp, Layers, Users, Lock, AlertTriangle
+  ArrowLeft, X, ExternalLink, 
+  Shield, Copy, Check,
+  TrendingUp
 } from 'lucide-react';
 import './TokenDetailModal.css';
 
 const TokenDetailModal = ({ token, onClose }) => {
-  if (!token) return null;
-
   const [activeTab, setActiveTab] = useState('curve'); // 'curve' | 'audit'
-  const isOnCurve = token.launchpadProgress !== undefined && token.launchpadProgress < 1;
+  const isOnCurve = Boolean(token?.launchpadProgress !== undefined && token.launchpadProgress < 1);
   const [chartMode, setChartMode] = useState(isOnCurve ? 'curve' : 'dexscreener');
   const [copied, setCopied] = useState(false);
 
   // Close on Escape key press
   useEffect(() => {
+    if (!token) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [token, onClose]);
 
   // Lock background body scroll while modal is open
   useEffect(() => {
+    if (!token) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prevOverflow;
     };
-  }, []);
+  }, [token]);
+
+  if (!token) return null;
 
   const copyAddress = () => {
     if (token?.tokenAddress) {
