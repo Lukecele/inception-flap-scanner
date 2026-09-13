@@ -248,6 +248,7 @@ const flapProxy = () => ({
           ...(Array.isArray(apiRes?.near_completion) ? apiRes.near_completion : []),
           ...(Array.isArray(apiRes?.completed) ? apiRes.completed : [])
         ];
+        rawList.sort((a, b) => (b.created_timestamp || 0) - (a.created_timestamp || 0));
 
         const seen = new Set();
         const formattedList = [];
@@ -278,6 +279,7 @@ const flapProxy = () => ({
               tokenName: item.name,
               tokenSymbol: item.symbol,
               realLogo: item.logo,
+              createdTimestamp: item.created_timestamp || Math.floor(Date.now() / 1000),
               isStealth, hasTelegram: !!tgUrl, hasTwitter: !!xUrl,
               tgUrl, xUrl, websiteUrl,
               hasSocialClone: false, cloneWarning: null,
@@ -285,7 +287,7 @@ const flapProxy = () => ({
               isHighTax: false, taxKnown: buyTax !== null, buyTax, sellTax,
               devClusterHistory: "✅ Verified GMGN", pastScamsCount: 0, funderText: "Exchange/Bridge",
               webStatus: isStealth ? "No public socials" : "✅ Verified socials",
-              block: 0, timestamp, isHistorical: true,
+              block: 0, timestamp, isHistorical: false,
               kolCount: item.renowned_count || 0, smartMoneyCount: item.smart_degen_count || 0, whaleCount: 0, sniperCount: item.sniper_count || 0,
               creatorCreatedCount: item.creator_created_count || 0, liquidityUsd: item.liquidity || 0, marketCapUsd: item.usd_market_cap || 0,
               isHoneypot: item.is_honeypot === 'yes', launchpadProgress: item.launchpad_progress || 0,
@@ -293,6 +295,8 @@ const flapProxy = () => ({
             });
           }
         }
+
+        formattedList.sort((a, b) => (b.createdTimestamp || 0) - (a.createdTimestamp || 0));
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, tokens: formattedList }));

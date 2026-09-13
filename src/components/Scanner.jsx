@@ -25,6 +25,17 @@ const STANDARD_IMPLS = [
   '0x29e6383f0ce68507b5a72a53c2b118a118332aa8'
 ];
 
+const formatTimeAgo = (unixSec) => {
+  if (!unixSec) return 'Just now';
+  const diffSec = Math.max(0, Math.floor(Date.now() / 1000 - unixSec));
+  if (diffSec < 60) return `${diffSec}s ago`;
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.floor(diffHours / 24)}d ago`;
+};
+
 const implSeenCount = {};
 const socialRegistry = {};
 
@@ -121,8 +132,11 @@ const Scanner = () => {
         : `🚨 Socials cloned from ${ (tgCloneOf || xCloneOf || webCloneOf).slice(0, 10) }...`;
     }
 
+    const createdTimestamp = rawToken.createdTimestamp || Math.floor(Date.now() / 1000);
+
     let enrichedToken = {
       ...rawToken,
+      createdTimestamp,
       taxInnovation: "Analyzing contract...",
       devClusterHistory: "Analyzing BscScan...",
       pastScamsCount: 0,
@@ -130,12 +144,18 @@ const Scanner = () => {
       hasSocialClone,
       cloneWarning,
       webStatus: rawToken.isStealth ? "No public socials" : (cloneWarning || "✅ Verified socials"),
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      timestamp: formatTimeAgo(createdTimestamp)
     };
 
     setTokens(prev => {
-      if (prev.some(t => t.tokenAddress?.toLowerCase() === tokenKey)) return prev;
-      return [enrichedToken, ...prev].slice(0, 100);
+      const map = new Map();
+      prev.forEach(t => map.set(t.tokenAddress.toLowerCase(), t));
+      if (!map.has(tokenKey)) {
+        map.set(tokenKey, enrichedToken);
+      }
+      return Array.from(map.values())
+        .sort((a, b) => (b.createdTimestamp || 0) - (a.createdTimestamp || 0))
+        .slice(0, 100);
     });
 
     // PHASE 3 · TAX IMPL
@@ -197,20 +217,22 @@ const Scanner = () => {
       } catch (_) {}
     }
 
-    setTokens(prev => prev.map(t => {
-      if (t.tokenAddress?.toLowerCase() === tokenKey) {
-        const webStatus = t.isStealth ? "No public socials" : (cloneWarning || "✅ Verified socials");
-        return {
-          ...t,
-          taxInnovation,
-          devClusterHistory,
-          funderText,
-          pastScamsCount,
-          webStatus
-        };
-      }
-      return t;
-    }));
+    setTokens(prev => {
+      return prev.map(t => {
+        if (t.tokenAddress?.toLowerCase() === tokenKey) {
+          const webStatus = t.isStealth ? "No public socials" : (cloneWarning || "✅ Verified socials");
+          return {
+            ...t,
+            taxInnovation,
+            devClusterHistory,
+            funderText,
+            pastScamsCount,
+            webStatus
+          };
+        }
+        return t;
+      }).sort((a, b) => (b.createdTimestamp || 0) - (a.createdTimestamp || 0));
+    });
   };
 
   const fetchLiveLaunches = async () => {
@@ -252,11 +274,13 @@ const Scanner = () => {
     };
   }, []);
 
-  const validTokens = tokens.filter(t => {
-    const isBuyHigh = t.buyTax !== null && t.buyTax > 9;
-    const isSellHigh = t.sellTax !== null && t.sellTax > 9;
-    return !isBuyHigh && !isSellHigh;
-  });
+  const validTokens = tokens
+    .filter(t => {
+      const isBuyHigh = t.buyTax !== null && t.buyTax > 9;
+      const isSellHigh = t.sellTax !== null && t.sellTax > 9;
+      return !isBuyHigh && !isSellHigh;
+    })
+    .sort((a, b) => (b.createdTimestamp || 0) - (a.createdTimestamp || 0));
 
   return (
     <div className="scanner-container">
@@ -314,7 +338,7 @@ const Scanner = () => {
                 </div>
                 <div className="header-right">
                   <span className="timestamp-badge">
-                    ⏱ {token.timestamp} · 📦 NEW LAUNCH
+                    ⏱ {formatTimeAgo(token.createdTimestamp)} · 📦 {token.launchpadProgress && token.launchpadProgress >= 1 ? 'MIGRATED' : `${Math.round((token.launchpadProgress || 0) * 100)}% ON CURVE`}
                   </span>
                   <a href={`https://bscscan.com/token/${token.tokenAddress}`} target="_blank" rel="noreferrer" className="tx-link" onClick={e => e.stopPropagation()}>BscScan ↗</a>
                 </div>
