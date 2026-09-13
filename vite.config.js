@@ -4,6 +4,69 @@ import https from 'https';
 import { exec } from 'child_process';
 import fs from 'fs';
 import crypto from 'crypto';
+import os from 'os';
+import path from 'path';
+
+const resolveGmgnCredentials = () => {
+  let apiKey = process.env.GMGN_API_KEY;
+  let privateKeyPem = process.env.GMGN_PRIVATE_KEY;
+
+  // 1. Check local .env in current directory
+  if ((!apiKey || !privateKeyPem) && fs.existsSync('./.env')) {
+    try {
+      const envContent = fs.readFileSync('./.env', 'utf8');
+      if (!apiKey) {
+        const m = envContent.match(/^GMGN_API_KEY=(.+)$/m);
+        if (m) apiKey = m[1].trim().replace(/^["']|["']$/g, '');
+      }
+      if (!privateKeyPem) {
+        const m = envContent.match(/^GMGN_PRIVATE_KEY="?([\s\S]+?)"?$/m);
+        if (m) privateKeyPem = m[1].trim();
+      }
+    } catch (_) {}
+  }
+
+  // 2. Check user config ~/.config/gmgn/.env
+  const homeDir = os.homedir();
+  const userGmgnEnv = path.join(homeDir, '.config', 'gmgn', '.env');
+  if ((!apiKey || !privateKeyPem) && fs.existsSync(userGmgnEnv)) {
+    try {
+      const envContent = fs.readFileSync(userGmgnEnv, 'utf8');
+      if (!apiKey) {
+        const m = envContent.match(/^GMGN_API_KEY=(.+)$/m);
+        if (m) apiKey = m[1].trim().replace(/^["']|["']$/g, '');
+      }
+      if (!privateKeyPem) {
+        const m = envContent.match(/^GMGN_PRIVATE_KEY="?([\s\S]+?)"?$/m);
+        if (m) privateKeyPem = m[1].trim();
+      }
+    } catch (_) {}
+  }
+
+  // 3. Check local ./gmgn_private.pem
+  if (!privateKeyPem && fs.existsSync('./gmgn_private.pem')) {
+    try { privateKeyPem = fs.readFileSync('./gmgn_private.pem', 'utf8'); } catch (_) {}
+  }
+
+  // 4. Check ~/.config/gmgn/keypair.pem
+  const userKeypairPem = path.join(homeDir, '.config', 'gmgn', 'keypair.pem');
+  if (!privateKeyPem && fs.existsSync(userKeypairPem)) {
+    try { privateKeyPem = fs.readFileSync(userKeypairPem, 'utf8'); } catch (_) {}
+  }
+
+  if (!apiKey) {
+    apiKey = 'gmgn_6c719521eb31032ca2ecf471b0143fab';
+  }
+
+  if (privateKeyPem) {
+    privateKeyPem = privateKeyPem.replace(/\\n/g, '\n').trim();
+    if (privateKeyPem.startsWith('"') && privateKeyPem.endsWith('"')) {
+      privateKeyPem = privateKeyPem.slice(1, -1).replace(/\\n/g, '\n').trim();
+    }
+  }
+
+  return { apiKey, privateKeyPem };
+};
 
 const flapProxy = () => ({
   name: 'flap-proxy',
@@ -173,8 +236,9 @@ const flapProxy = () => ({
           throw new Error("Impossibile caricare l'SDK di gmgn-cli");
         }
 
+        const creds = resolveGmgnCredentials();
         const client = new OpenApiClient({
-          apiKey: process.env.GMGN_API_KEY || 'gmgn_6c719521eb31032ca2ecf471b0143fab',
+          apiKey: creds.apiKey,
           host: 'https://openapi.gmgn.ai'
         });
         const apiRes = await client.getTrenches('bsc', ['new_creation', 'near_completion'], ['flap'], 80);
@@ -205,7 +269,7 @@ const flapProxy = () => ({
 
             const isStealth = !tgUrl && !xUrl && !websiteUrl;
             const date = new Date(item.created_timestamp * 1000);
-            const timestamp = `${date.toLocaleDateString('it-IT')} ${date.toLocaleTimeString('it-IT')}`;
+            const timestamp = `${date.toLocaleDateString('en-US')} ${date.toLocaleTimeString('en-US')}`;
 
             formattedList.push({
               txHash: '0x',
@@ -217,10 +281,10 @@ const flapProxy = () => ({
               isStealth, hasTelegram: !!tgUrl, hasTwitter: !!xUrl,
               tgUrl, xUrl, websiteUrl,
               hasSocialClone: false, cloneWarning: null,
-              taxInnovation: buyTax === 0 ? "Standard (Nessuna Tassa)" : "Proxy Standard Flap",
+              taxInnovation: buyTax === 0 ? "Standard (No Tax)" : "Standard Flap Proxy",
               isHighTax: false, taxKnown: buyTax !== null, buyTax, sellTax,
-              devClusterHistory: "✅ Verificato GMGN", pastScamsCount: 0, funderText: "Exchange/Bridge",
-              webStatus: isStealth ? "Nessun social pubblico" : "✅ Social verificati",
+              devClusterHistory: "✅ Verified GMGN", pastScamsCount: 0, funderText: "Exchange/Bridge",
+              webStatus: isStealth ? "No public socials" : "✅ Verified socials",
               block: 0, timestamp, isHistorical: true,
               kolCount: item.renowned_count || 0, smartMoneyCount: item.smart_degen_count || 0, whaleCount: 0, sniperCount: item.sniper_count || 0,
               creatorCreatedCount: item.creator_created_count || 0, liquidityUsd: item.liquidity || 0, marketCapUsd: item.usd_market_cap || 0,
@@ -317,21 +381,13 @@ const flapProxy = () => ({
       const cleanTokenIn = tokenIn.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? '0x0000000000000000000000000000000000000000' : tokenIn;
       const cleanTokenOut = tokenOut.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? '0x0000000000000000000000000000000000000000' : tokenOut;
 
-      const apiKey = process.env.GMGN_API_KEY || 'gmgn_6c719521eb31032ca2ecf471b0143fab';
-      let privateKeyPem = process.env.GMGN_PRIVATE_KEY;
-      if (!privateKeyPem) {
-        try {
-          if (fs.existsSync('./gmgn_private.pem')) {
-            privateKeyPem = fs.readFileSync('./gmgn_private.pem', 'utf8');
-          }
-        } catch (e) {}
-      }
+      const { apiKey, privateKeyPem } = resolveGmgnCredentials();
 
       if (!privateKeyPem) {
         res.statusCode = 503;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
-          error: 'GMGN signature authentication unavailable. Set GMGN_PRIVATE_KEY in environment variables or provide local gmgn_private.pem.'
+          error: 'GMGN signature authentication unavailable. Set GMGN_PRIVATE_KEY in Hugging Face Space secrets or provide ~/.config/gmgn/keypair.pem locally.'
         }));
         return;
       }
@@ -349,16 +405,22 @@ const flapProxy = () => ({
       const message = `${subPath}:${sortedQs}::${timestamp}`;
 
       let signature;
-      try { signature = crypto.sign(null, Buffer.from(message, 'utf-8'), privateKeyPem).toString('base64'); } catch (e) {
-        res.statusCode = 500; res.end(JSON.stringify({ error: `Signature failed: ${e.message}` })); return;
+      try {
+        signature = crypto.sign(null, Buffer.from(message, 'utf-8'), privateKeyPem).toString('base64');
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: `Signature failed: ${e.message}` }));
+        return;
       }
 
       const url = `https://openapi.gmgn.ai${subPath}?${new URLSearchParams(queryParams).toString()}`;
-      https.get(url, { headers: { 'X-APIKEY': apiKey, 'X-Signature': signature, 'Content-Type': 'application/json' } }, (response) => {
+      const reqG = https.get(url, { headers: { 'X-APIKEY': apiKey, 'X-Signature': signature, 'Content-Type': 'application/json' } }, (response) => {
         let data = '';
         response.on('data', chunk => data += chunk);
         response.on('end', () => {
           res.setHeader('Content-Type', 'application/json');
+          res.statusCode = response.statusCode || 200;
           try {
             const json = JSON.parse(data);
             if (json.data) {
@@ -371,9 +433,20 @@ const flapProxy = () => ({
                 };
               }
             }
+            if (response.statusCode >= 400 && !json.error) {
+              json.error = json.message || `GMGN API error (${response.statusCode})`;
+            }
             res.end(JSON.stringify(json));
-          } catch (e) { res.end(data); }
+          } catch (e) {
+            res.end(data);
+          }
         });
+      });
+
+      reqG.on('error', (err) => {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: `Failed to connect to GMGN: ${err.message}` }));
       });
     });
 

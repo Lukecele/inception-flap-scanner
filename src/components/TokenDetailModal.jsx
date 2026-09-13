@@ -58,6 +58,41 @@ const TokenDetailModal = ({ token, onClose }) => {
     }
   };
 
+  const ensureBscNetwork = async () => {
+    if (!window.ethereum) return false;
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      if (chainId === '0x38' || chainId === '0x0038' || chainId === 56 || chainId === '56') {
+        return true;
+      }
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x38' }]
+        });
+        return true;
+      } catch (switchError) {
+        if (switchError.code === 4902 || switchError.data?.originalError?.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38',
+              chainName: 'BNB Smart Chain Mainnet',
+              nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+              rpcUrls: ['https://bsc-dataseed.binance.org/'],
+              blockExplorerUrls: ['https://bscscan.com/']
+            }]
+          });
+          return true;
+        }
+        throw switchError;
+      }
+    } catch (err) {
+      addLog(`⚠️ Network: Switch MetaMask to BNB Smart Chain (${err.message})`);
+      return false;
+    }
+  };
+
   const getERC20Balance = async (tokenAddr, userAddr) => {
     if (!window.ethereum) return 0n;
     try {
@@ -109,10 +144,14 @@ const TokenDetailModal = ({ token, onClose }) => {
         setUserTokenBalance(0n);
       }
     };
-    const onChain = () => {
-      window.ethereum.request({ method: 'eth_accounts' })
-        .then(a => { if (a.length > 0) updateBalances(a[0]); })
-        .catch(() => {});
+    const onChain = async (chainId) => {
+      if (chainId !== '0x38' && chainId !== '56' && chainId !== 56) {
+        addLog('⚠️ Switched network. Please switch back to BNB Smart Chain (BSC)');
+      }
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) updateBalances(accounts[0]);
+      } catch (_) {}
     };
 
     window.ethereum.on('accountsChanged', onAccounts);
@@ -121,7 +160,7 @@ const TokenDetailModal = ({ token, onClose }) => {
       window.ethereum.removeListener('accountsChanged', onAccounts);
       window.ethereum.removeListener('chainChanged', onChain);
     };
-  }, [updateBalances]);
+  }, [updateBalances, addLog]);
 
   // Quote calculation
   useEffect(() => {
@@ -164,6 +203,16 @@ const TokenDetailModal = ({ token, onClose }) => {
           setLoadingQuote(false);
           return;
         }
+        if (d?.code === 429 || d?.error === 'RATE_LIMIT_EXCEEDED' || d?.error === 'RATE_LIMIT_BANNED') {
+          setQuoteError('⏳ GMGN quote rate limit (free tier cooldown). Try again in ~30s.');
+          setLoadingQuote(false);
+          return;
+        }
+        if (d?.error && d.error.includes('signature authentication unavailable')) {
+          setQuoteError('🔑 GMGN_PRIVATE_KEY needed in Space secrets or local keypair.pem');
+          setLoadingQuote(false);
+          return;
+        }
         if (d?.data?.quote) {
           const outRaw = d.data.quote.out_amount ?? d.data.quote.output_amount ?? d.data.quote.buy_amount ?? '0';
           const outNum = Number(BigInt(outRaw)) / 1e18;
@@ -188,12 +237,13 @@ const TokenDetailModal = ({ token, onClose }) => {
     if (!window.ethereum) { alert('Please install MetaMask to trade!'); return; }
     try {
       addLog('Connecting wallet…');
+      await ensureBscNetwork();
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       if (accounts.length > 0) {
         setWalletConnected(true);
         setWalletAddress(accounts[0]);
         await updateBalances(accounts[0]);
-        addLog(`✅ Wallet: ${accounts[0].slice(0,6)}…${accounts[0].slice(-4)}`);
+        addLog(`✅ Connected: ${accounts[0].slice(0,6)}…${accounts[0].slice(-4)}`);
       }
     } catch (e) { addLog(`🚨 ${e.message}`); }
   };
@@ -206,8 +256,8 @@ const TokenDetailModal = ({ token, onClose }) => {
     setStatusLogs([]);
 
     try {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if (chainId !== '0x38') throw new Error(`Please switch to BSC (BNB Chain) in MetaMask!`);
+      const isBsc = await ensureBscNetwork();
+      if (!isBsc) throw new Error(`Please switch to BSC (BNB Chain) in MetaMask!`);
 
       if (tradeType === 'buy') {
         const raw = parseFloat(String(buyAmount).replace(',', '.').trim());

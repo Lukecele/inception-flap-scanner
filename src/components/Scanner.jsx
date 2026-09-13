@@ -289,7 +289,7 @@ const Scanner = () => {
           </div>
         ) : validTokens.map((token, idx) => {
           const isScrap = token.pastScamsCount > 20 || token.hasSocialClone || 
-                          token.isHoneypot || token.taxInnovation?.includes('🆕 Proxy Custom');
+                          token.isHoneypot || token.taxInnovation?.includes('Custom') || token.taxInnovation?.includes('Suspicious');
           const isPending = token.devClusterHistory === "Analyzing BscScan...";
           const cardClass = isScrap ? 'card-rejected' : isPending ? 'card-pending' : 'card-passed';
           
