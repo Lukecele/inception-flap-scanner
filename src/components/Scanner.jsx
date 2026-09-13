@@ -115,8 +115,8 @@ const Scanner = () => {
     const tokenKey = addr.toLowerCase();
     const trueDev = rawToken.creator || "0x0000000000000000000000000000000000000000";
 
-    // STRICT EXCLUSION: If tax > 9%, discard token before running further operations
-    if ((rawToken.buyTax && rawToken.buyTax > 9) || (rawToken.sellTax && rawToken.sellTax > 9)) {
+    // STRICT EXCLUSION: If tax > 8%, discard token before running further operations (max 8% + 1% Flap fee)
+    if ((rawToken.buyTax && rawToken.buyTax > 8) || (rawToken.sellTax && rawToken.sellTax > 8)) {
       return;
     }
 
@@ -276,8 +276,8 @@ const Scanner = () => {
 
   const validTokens = tokens
     .filter(t => {
-      const isBuyHigh = t.buyTax !== null && t.buyTax > 9;
-      const isSellHigh = t.sellTax !== null && t.sellTax > 9;
+      const isBuyHigh = t.buyTax !== null && t.buyTax > 8;
+      const isSellHigh = t.sellTax !== null && t.sellTax > 8;
       return !isBuyHigh && !isSellHigh;
     })
     .sort((a, b) => (b.createdTimestamp || 0) - (a.createdTimestamp || 0));
@@ -287,7 +287,7 @@ const Scanner = () => {
       <div className="scanner-status">
         <div className={`status-dot ${isConnected ? 'active' : 'inactive'}`}></div>
         <span className="font-mono text-sm text-bright">
-          {isConnected ? 'LIVE — GMGN STREAM (EXCLUDING TAX > 9%)' : 'CONNECTING STREAM...'}
+          {isConnected ? 'LIVE — GMGN STREAM (EXCLUDING TAX > 8%)' : 'CONNECTING STREAM...'}
         </span>
         <div className="filter-badge"><Zap size={11} className="mr-1 inline-icon"/>CENTAUR SCANNER</div>
         <button 

@@ -9,7 +9,7 @@ import {
 } from '../src/utils/security-auditor.js';
 
 describe('Security Auditor - Tax Risk Evaluation', () => {
-  it('accepts zero and normal taxes under threshold', () => {
+  it('accepts zero and normal taxes under threshold (<= 8%)', () => {
     const res = evaluateTaxRisk(0, 0);
     assert.equal(res.isHighTax, false);
     assert.equal(res.status, 'ACCEPTABLE');
@@ -17,12 +17,15 @@ describe('Security Auditor - Tax Risk Evaluation', () => {
     const res3 = evaluateTaxRisk(3, 3);
     assert.equal(res3.isHighTax, false);
     assert.equal(res3.buyTax, 3);
+
+    const res8 = evaluateTaxRisk(8, 8);
+    assert.equal(res8.isHighTax, false);
   });
 
-  it('flags predatory taxes above threshold (> 9%)', () => {
-    const res10 = evaluateTaxRisk(10, 2);
-    assert.equal(res10.isHighTax, true);
-    assert.equal(res10.status, 'HIGH_RISK_TAX');
+  it('flags predatory taxes above threshold (> 8%)', () => {
+    const res9 = evaluateTaxRisk(9, 2);
+    assert.equal(res9.isHighTax, true);
+    assert.equal(res9.status, 'HIGH_RISK_TAX');
 
     const resSell = evaluateTaxRisk(1, 15);
     assert.equal(resSell.isHighTax, true);

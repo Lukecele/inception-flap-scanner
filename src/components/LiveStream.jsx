@@ -3,9 +3,9 @@ import { AlertTriangle, Filter, Trash2, XCircle } from 'lucide-react';
 import './LiveStream.css';
 
 const MOCK_STREAM = [
-  { id: 1, name: 'SafeMoonX', tax: '11/11', reason: 'High Tax Bot (>9%)', time: '1s ago' },
+  { id: 1, name: 'SafeMoonX', tax: '11/11', reason: 'High Tax Bot (>8%)', time: '1s ago' },
   { id: 2, name: 'DogeInu2', tax: '0/0', reason: 'Clone/Proxy Detected', time: '4s ago' },
-  { id: 3, name: 'PepeKiller', tax: '10/10', reason: 'High Tax Bot (>9%)', time: '12s ago' },
+  { id: 3, name: 'PepeKiller', tax: '10/10', reason: 'High Tax Bot (>8%)', time: '12s ago' },
   { id: 4, name: 'FlapTest', tax: '0/0', reason: 'Dev Wallet Scam Cluster', time: '21s ago' },
   { id: 5, name: 'YieldAI', tax: '0/0', reason: 'Socials Cloned', time: '35s ago' }
 ];
@@ -21,7 +21,7 @@ const LiveStream = () => {
         id: Date.now(),
         name: newItems[Math.floor(Math.random() * newItems.length)] + Math.floor(Math.random() * 100),
         tax: Math.random() > 0.5 ? '10/10' : '0/0',
-        reason: Math.random() > 0.5 ? 'High Tax Bot (>9%)' : 'Clone/Proxy Detected',
+        reason: Math.random() > 0.5 ? 'High Tax Bot (>8%)' : 'Clone/Proxy Detected',
         time: 'Just now'
       };
       

@@ -347,8 +347,8 @@ const TokenDetailModal = ({ token, onClose }) => {
                 <div className="audit-card">
                   <div className="audit-card-top">
                     <span className="audit-card-title">3. TAX & HONEYPOT SAFEGUARD</span>
-                    <span className={`audit-badge ${((token.buyTax && token.buyTax > 9) || (token.sellTax && token.sellTax > 9)) ? 'badge-danger' : 'badge-good'}`}>
-                      {((token.buyTax && token.buyTax > 9) || (token.sellTax && token.sellTax > 9)) ? '🚨 PREDATORY' : '✅ SAFE (<9%)'}
+                    <span className={`audit-badge ${((token.buyTax && token.buyTax > 8) || (token.sellTax && token.sellTax > 8)) ? 'badge-danger' : 'badge-good'}`}>
+                      {((token.buyTax && token.buyTax > 8) || (token.sellTax && token.sellTax > 8)) ? '🚨 PREDATORY (>8%)' : '✅ SAFE (≤8%)'}
                     </span>
                   </div>
                   <div className="audit-card-body">

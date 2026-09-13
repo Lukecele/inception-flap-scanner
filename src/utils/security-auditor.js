@@ -18,9 +18,9 @@ export const POPULAR_SOCIALS_BLACKLIST = [
 
 /**
  * Validates tax bounds against maximum acceptable risk thresholds.
- * Tokens with tax > 9% are flagged as high risk / predatory.
+ * Tokens with tax > 8% are flagged as high risk / predatory (accounting for Flap's 1% fee).
  */
-export function evaluateTaxRisk(buyTax, sellTax, maxThreshold = 9) {
+export function evaluateTaxRisk(buyTax, sellTax, maxThreshold = 8) {
   const b = Number(buyTax) || 0;
   const s = Number(sellTax) || 0;
   const isHighTax = b > maxThreshold || s > maxThreshold;
