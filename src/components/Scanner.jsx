@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, ShieldAlert, Network, CheckCircle, Search, Brain, Zap, Target, Activity } from 'lucide-react';
+import { Shield, ShieldAlert, Network, CheckCircle, Search, Brain, Zap, Target, Activity, ChevronRight } from 'lucide-react';
 import { ethers } from 'ethers';
 import './Scanner.css';
 import historicalTokensData from '../assets/historical_tokens.json';
@@ -305,6 +305,15 @@ const Scanner = () => {
         <span className="font-mono text-sm ml-auto text-cyan">AUDIT MODE ACTIVE</span>
       </div>
 
+      {/* Visual Instruction Banner */}
+      <div className="scanner-instruction-banner">
+        <span className="instruction-icon">💡</span>
+        <span className="instruction-text">
+          <strong>INTERACTIVE FEED:</strong> Click any token card to view Flap Bonding Curve Telemetry, Live Chart & Deep Security Audit.
+        </span>
+        <span className="instruction-pill">CLICK CARD TO INSPECT</span>
+      </div>
+
       <div className="token-list">
         {validTokens.length === 0 ? (
           <div className="empty-state font-mono text-muted">
@@ -318,7 +327,7 @@ const Scanner = () => {
           const cardClass = isScrap ? 'card-rejected' : isPending ? 'card-pending' : 'card-passed';
           
           return (
-            <div key={idx} className={`token-card animate-slide-in ${cardClass}`} onClick={() => setSelectedToken(token)} style={{ cursor: 'pointer' }}>
+            <div key={idx} className={`token-card animate-slide-in ${cardClass}`} onClick={() => setSelectedToken(token)} role="button" tabIndex={0}>
 
               <div className="card-header">
                 <div className="header-left">
@@ -337,10 +346,16 @@ const Scanner = () => {
                   </div>
                 </div>
                 <div className="header-right">
-                  <span className="timestamp-badge">
-                    ⏱ {formatTimeAgo(token.createdTimestamp)} · 📦 {token.launchpadProgress && token.launchpadProgress >= 1 ? 'MIGRATED' : `${Math.round((token.launchpadProgress || 0) * 100)}% ON CURVE`}
-                  </span>
-                  <a href={`https://bscscan.com/token/${token.tokenAddress}`} target="_blank" rel="noreferrer" className="tx-link" onClick={e => e.stopPropagation()}>BscScan ↗</a>
+                  <div className="header-meta-row">
+                    <span className="timestamp-badge">
+                      ⏱ {formatTimeAgo(token.createdTimestamp)} · 📦 {token.launchpadProgress && token.launchpadProgress >= 1 ? 'MIGRATED' : `${Math.round((token.launchpadProgress || 0) * 100)}% ON CURVE`}
+                    </span>
+                    <a href={`https://bscscan.com/token/${token.tokenAddress}`} target="_blank" rel="noreferrer" className="tx-link" onClick={e => e.stopPropagation()}>BscScan ↗</a>
+                  </div>
+                  <div className="card-inspect-pill" title="Click to view Bonding Curve & Security Details">
+                    <span>INSPECT CURVE</span>
+                    <ChevronRight size={13} className="pill-arrow" />
+                  </div>
                 </div>
               </div>
 
@@ -411,9 +426,16 @@ const Scanner = () => {
               </div>
               
               <div className="card-action-bar">
-                <span className="action-text">
-                  {isPending ? '⏳ ACQUIRING ANTI-SCAM SECURITY TELEMETRY...' : isScrap ? '🚨 ANOMALY DETECTED (CHECK AUDIT DETAILS)' : '🔍 ANALYSIS COMPLETE — READY FOR FAST SWAP'}
-                </span>
+                <div className="action-bar-left">
+                  <span className={`action-status-dot ${isScrap ? 'dot-danger' : isPending ? 'dot-pending' : 'dot-good'}`}></span>
+                  <span className="action-text">
+                    {isPending ? '⏳ ACQUIRING ANTI-SCAM SECURITY TELEMETRY...' : isScrap ? '🚨 ANOMALY DETECTED (CHECK AUDIT DETAILS)' : '✅ SECURITY AUDIT PASSED'}
+                  </span>
+                </div>
+                <div className="action-bar-cta">
+                  <span>CLICK TO VIEW CURVE & AUDIT</span>
+                  <span className="action-cta-arrow">➔</span>
+                </div>
               </div>
             </div>
           );

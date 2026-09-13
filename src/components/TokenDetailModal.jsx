@@ -39,14 +39,24 @@ const TokenDetailModal = ({ token, onClose }) => {
     <div className="detail-modal-overlay" onClick={onClose}>
       <div className="detail-modal-card" onClick={e => e.stopPropagation()}>
         
-        {/* Modal Header */}
-        <div className="modal-header">
-          <div className="modal-header-left">
-            <button className="back-btn" onClick={onClose} title="Back to Scanner">
-              <ArrowLeft size={16} />
-              <span>BACK</span>
+        {/* Top Navigation Bar: Guaranteed visible, dedicated Back button */}
+        <div className="modal-top-nav-bar">
+          <button className="back-to-scanner-btn" onClick={onClose} title="Back to Scanner Feed">
+            <ArrowLeft size={16} />
+            <span>← BACK TO SCANNER FEED</span>
+          </button>
+          
+          <div className="top-nav-actions">
+            <span className="esc-key-hint font-mono">ESC</span>
+            <button className="modal-close-icon" onClick={onClose} title="Close modal (Esc)">
+              <X size={18} />
             </button>
+          </div>
+        </div>
 
+        {/* Token Identity Banner */}
+        <div className="modal-token-banner">
+          <div className="banner-left">
             <img
               src={token.realLogo || `https://api.dicebear.com/9.x/shapes/svg?seed=${token.tokenAddress}`}
               alt={token.tokenSymbol}
@@ -81,7 +91,7 @@ const TokenDetailModal = ({ token, onClose }) => {
             </div>
           </div>
 
-          <div className="modal-header-right">
+          <div className="banner-right">
             {isOnCurve ? (
               <span className="curve-status-chip on-curve">
                 🚀 ON FLAP CURVE ({curvePercent}%)
@@ -101,10 +111,6 @@ const TokenDetailModal = ({ token, onClose }) => {
               <span>Trade on Flap.sh</span>
               <ExternalLink size={13} />
             </a>
-
-            <button className="modal-close-icon" onClick={onClose} title="Close modal">
-              <X size={18} />
-            </button>
           </div>
         </div>
 
@@ -387,6 +393,15 @@ const TokenDetailModal = ({ token, onClose }) => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Modal Bottom Return Bar for Easy Dismissal */}
+        <div className="modal-bottom-return-bar">
+          <button className="bottom-back-btn" onClick={onClose} title="Return to Live Scanner Feed">
+            <ArrowLeft size={15} />
+            <span>← Return to Live Scanner Feed</span>
+          </button>
+          <span className="bottom-esc-hint font-mono">Press ESC or click outside to dismiss</span>
         </div>
 
       </div>
