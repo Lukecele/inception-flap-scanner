@@ -112,6 +112,7 @@
 .token-list {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0.8rem;
 }
 
@@ -130,6 +131,7 @@
   overflow: hidden;
   cursor: pointer !important;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
               box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
               border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
@@ -480,6 +482,20 @@
   }
   .token-list {
     padding: 0.35rem 0.25rem;
+  }
+  .card-header {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .header-right {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.2rem;
+  }
+  .card-inspect-pill {
+    margin-top: 0;
   }
   .token-name {
     max-width: 105px;

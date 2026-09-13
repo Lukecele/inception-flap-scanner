@@ -279,6 +279,8 @@
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 1rem 1.2rem;
   box-sizing: border-box;
 }
@@ -647,12 +649,14 @@
   }
 
   .modal-top-nav-bar {
-    padding: 0.45rem 0.8rem;
+    padding: 0.5rem 0.8rem;
+    min-height: 48px;
   }
 
   .back-to-scanner-btn {
-    font-size: 0.7rem;
-    padding: 0.38rem 0.8rem;
+    font-size: 0.72rem;
+    padding: 0.45rem 0.85rem;
+    min-height: 38px;
   }
 
   .modal-token-banner {
@@ -667,27 +671,77 @@
     display: none;
   }
 
+  .modal-tab-selector {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .tab-btn {
+    font-size: 0.7rem;
+    padding: 6px 12px;
+  }
+
+  .modal-body-content {
+    padding: 0.75rem 0.8rem;
+  }
+
+  .curve-telemetry-banner {
+    padding: 0.85rem;
+  }
+
+  .curve-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .curve-primary-btn,
+  .curve-secondary-btn {
+    min-width: 0;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .audit-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .curve-actions-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chart-embed-wrapper {
+    height: 320px;
+  }
+
   .modal-bottom-return-bar {
-    padding: 0.45rem 0.8rem;
+    padding: 0.5rem 0.8rem;
+    min-height: 48px;
+  }
+
+  .bottom-back-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    min-height: 40px;
   }
 
   .bottom-esc-hint {
     display: none;
   }
+}
 
-  .curve-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 420px) {
+  .modal-token-name {
+    font-size: 0.92rem;
   }
-
-  .audit-grid {
-    grid-template-columns: 1fr;
+  .token-symbol-badge {
+    font-size: 0.7rem;
   }
-
-  .curve-actions-row {
-    flex-direction: column;
+  .stat-value {
+    font-size: 0.88rem;
   }
-
   .chart-embed-wrapper {
-    height: 340px;
+    height: 280px;
   }
 }
