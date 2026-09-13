@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   ArrowLeft, X, ExternalLink, Activity, 
   Shield, ShieldAlert, CheckCircle, Copy, Check,
@@ -7,6 +8,8 @@ import {
 import './TokenDetailModal.css';
 
 const TokenDetailModal = ({ token, onClose }) => {
+  if (!token) return null;
+
   const [activeTab, setActiveTab] = useState('curve'); // 'curve' | 'audit'
   const isOnCurve = token.launchpadProgress !== undefined && token.launchpadProgress < 1;
   const [chartMode, setChartMode] = useState(isOnCurve ? 'curve' : 'dexscreener');
@@ -20,6 +23,15 @@ const TokenDetailModal = ({ token, onClose }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  // Lock background body scroll while modal is open
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
 
   const copyAddress = () => {
     if (token?.tokenAddress) {
@@ -35,8 +47,19 @@ const TokenDetailModal = ({ token, onClose }) => {
 
   const dexscreenerUrl = `https://dexscreener.com/bsc/${token.tokenAddress}?embed=1&theme=dark&trades=0&info=0`;
 
-  return (
-    <div className="detail-modal-overlay" onClick={onClose}>
+  const modalContent = (
+    <div className="detail-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      {/* Floating Close Button for immediate exit regardless of scroll position */}
+      <button 
+        className="modal-floating-close-btn" 
+        onClick={onClose} 
+        title="Close (Esc)"
+        aria-label="Close modal"
+      >
+        <X size={18} />
+        <span>CLOSE [ESC]</span>
+      </button>
+
       <div className="detail-modal-card" onClick={e => e.stopPropagation()}>
         
         {/* Top Navigation Bar: Guaranteed visible, dedicated Back button */}
@@ -57,6 +80,14 @@ const TokenDetailModal = ({ token, onClose }) => {
         {/* Token Identity Banner */}
         <div className="modal-token-banner">
           <div className="banner-left">
+            <button 
+              className="banner-inline-back-btn" 
+              onClick={onClose} 
+              title="Back to Scanner Feed"
+            >
+              <ArrowLeft size={14} />
+              <span>BACK</span>
+            </button>
             <img
               src={token.realLogo || `https://api.dicebear.com/9.x/shapes/svg?seed=${token.tokenAddress}`}
               alt={token.tokenSymbol}
@@ -407,6 +438,10 @@ const TokenDetailModal = ({ token, onClose }) => {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 };
 
 export default TokenDetailModal;

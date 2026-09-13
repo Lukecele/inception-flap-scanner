@@ -1,7 +1,6 @@
 /* === Scanner Layout === */
 .scanner-container {
-  background: rgba(11, 12, 16, 0.92);
-  backdrop-filter: blur(12px);
+  background: #0e1117;
   border: 1px solid rgba(102, 252, 241, 0.18);
   border-radius: 12px;
   display: flex;

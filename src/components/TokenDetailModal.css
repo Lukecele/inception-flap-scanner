@@ -2,29 +2,64 @@
 .detail-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(4, 5, 8, 0.90);
-  backdrop-filter: blur(16px);
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(4, 5, 8, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
-  padding: 0.75rem;
+  z-index: 100000;
+  padding: 1rem;
   box-sizing: border-box;
+}
+
+/* === Floating Exit Button (Always visible on desktop overlay) === */
+.modal-floating-close-btn {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 100002;
+  background: rgba(11, 12, 16, 0.95);
+  border: 1px solid rgba(102, 252, 241, 0.4);
+  color: #66fcf1;
+  padding: 0.45rem 0.95rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 12px rgba(102, 252, 241, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-floating-close-btn:hover {
+  background: #66fcf1;
+  color: #0b0c10;
+  box-shadow: 0 0 22px rgba(102, 252, 241, 0.8);
+  transform: scale(1.04);
 }
 
 /* === Modal Card === */
 .detail-modal-card {
-  background: rgba(11, 12, 16, 0.98);
+  background: #0b0c10;
   border: 1px solid rgba(102, 252, 241, 0.25);
   box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(102, 252, 241, 0.08);
   border-radius: 14px;
   width: 100%;
   max-width: 960px;
+  height: calc(100vh - 2rem);
   height: calc(100dvh - 2rem);
   max-height: 880px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
 /* === Modal Top Nav Bar (Always visible, prominent Back button) === */
@@ -37,7 +72,9 @@
   justify-content: space-between;
   flex-shrink: 0;
   gap: 0.8rem;
-  z-index: 10;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .back-to-scanner-btn {
@@ -101,6 +138,31 @@
   gap: 0.75rem;
   min-width: 0;
   flex: 1;
+}
+
+.banner-inline-back-btn {
+  background: rgba(102, 252, 241, 0.12);
+  border: 1px solid rgba(102, 252, 241, 0.4);
+  color: #66fcf1;
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  box-shadow: 0 0 10px rgba(102, 252, 241, 0.15);
+}
+
+.banner-inline-back-btn:hover {
+  background: #66fcf1;
+  color: #0b0c10;
+  box-shadow: 0 0 16px rgba(102, 252, 241, 0.6);
+  transform: translateX(-2px);
 }
 
 .modal-token-logo {
@@ -637,33 +699,95 @@
 
 /* === Responsive Mobile Styling === */
 @media (max-width: 768px) {
-  .detail-modal-card {
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
-    border: none;
+  .detail-modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    width: 100vw !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #0b0c10 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 100000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
   }
 
-  .detail-modal-overlay {
-    padding: 0;
+  .detail-modal-card {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100% !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: #0b0c10 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .modal-floating-close-btn {
+    display: none !important;
   }
 
   .modal-top-nav-bar {
-    padding: 0.5rem 0.8rem;
-    min-height: 48px;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10001 !important;
+    background: #06070a !important;
+    border-bottom: 2px solid #66fcf1 !important;
+    padding: 0.6rem 0.85rem !important;
+    min-height: 52px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-shrink: 0 !important;
   }
 
   .back-to-scanner-btn {
-    font-size: 0.72rem;
-    padding: 0.45rem 0.85rem;
-    min-height: 38px;
+    font-size: 0.78rem !important;
+    padding: 0.5rem 0.95rem !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    font-weight: 900 !important;
+  }
+
+  .modal-close-icon {
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .modal-token-banner {
-    flex-wrap: wrap;
-    padding: 0.55rem 0.8rem;
-    gap: 0.5rem;
-    min-height: auto;
+    flex-wrap: wrap !important;
+    padding: 0.6rem 0.85rem !important;
+    gap: 0.5rem !important;
+    min-height: auto !important;
+    background: rgba(0, 0, 0, 0.6) !important;
   }
 
   .banner-right .curve-status-chip,
@@ -672,7 +796,7 @@
   }
 
   .modal-tab-selector {
-    padding: 0.5rem 0.8rem;
+    padding: 0.5rem 0.85rem;
   }
 
   .tab-btn {
@@ -681,7 +805,11 @@
   }
 
   .modal-body-content {
-    padding: 0.75rem 0.8rem;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0.75rem 0.85rem !important;
   }
 
   .curve-telemetry-banner {
@@ -715,15 +843,26 @@
   }
 
   .modal-bottom-return-bar {
-    padding: 0.5rem 0.8rem;
-    min-height: 48px;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10001 !important;
+    background: #06070a !important;
+    border-top: 1px solid rgba(102, 252, 241, 0.25) !important;
+    padding: 0.6rem 0.85rem !important;
+    min-height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
   }
 
   .bottom-back-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 0.5rem 1rem;
-    min-height: 40px;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.6rem 1rem !important;
+    min-height: 42px !important;
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
   }
 
   .bottom-esc-hint {
