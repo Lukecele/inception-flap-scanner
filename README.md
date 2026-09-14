@@ -12,10 +12,12 @@ app_port: 7860
 [![Status](https://img.shields.io/badge/Status-Live_Production-4ade80)](#)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow)](https://huggingface.co/spaces/Lucace/inception-flap-scanner)
 [![Security Audit](https://img.shields.io/badge/Security-4--Tier_Audit-66fcf1)](#-automated-4-tier-security-auditor)
+[![Awesome-Web3](https://awesome.re/mentioned-badge.svg)](https://github.com/ahmet/awesome-web3/blob/main/README.md#L345)
 
 A real-time on-chain token launch screener, Flap.sh bonding curve telemetry tracker, and automated 4-tier contract security auditor on **BNB Smart Chain (BSC)**. Fully containerized with Docker and continuously deployed on Hugging Face Spaces.
 
 **Live Application:** [https://lucace-inception-flap-scanner.hf.space](https://lucace-inception-flap-scanner.hf.space)  
+**Awesome-Web3 Directory:** [Risk Management (Line 345)](https://github.com/ahmet/awesome-web3/blob/main/README.md#L345) ([Merged PR #795](https://github.com/ahmet/awesome-web3/pull/795))  
 **Hugging Face Space:** [https://huggingface.co/spaces/Lucace/inception-flap-scanner](https://huggingface.co/spaces/Lucace/inception-flap-scanner)  
 **License:** [MIT](./LICENSE)
 
@@ -112,6 +114,12 @@ docker run -p 7860:7860 inception-flap-scanner
 ```
 
 Visit [http://localhost:7860](http://localhost:7860) to view the scanner dashboard.
+
+---
+
+## 🌐 Directory Indexing
+
+- **[Awesome-Web3 Directory](https://github.com/ahmet/awesome-web3):** Officially reviewed and indexed under [Risk Management (Line 345)](https://github.com/ahmet/awesome-web3/blob/main/README.md#L345) via [Merged PR #795](https://github.com/ahmet/awesome-web3/pull/795).
 
 ---
 
