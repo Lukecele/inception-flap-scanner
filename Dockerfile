@@ -1,4 +1,4 @@
-FROM node:22
+FROM node:26
 
 # Installa la CLI globale per far funzionare i comandi exec
 RUN npm install -g gmgn-cli
