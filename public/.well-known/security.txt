@@ -1,5 +1,4 @@
 # Security Policy for Inception Flap Scanner (RFC 9116)
-Contact: mailto:security@arbitrage-inc.exchange
 Contact: mailto:luca.celebrano1@gmail.com
 Contact: https://t.me/ArbitrageInception
 Expires: 2027-12-31T23:59:59.000Z
