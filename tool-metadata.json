@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Inception Flap Scanner",
+  "short_name": "Flap-Scanner",
+  "version": "1.1.0",
+  "description": "Real-time on-chain token launch screener, bonding curve telemetry tracker, and 4-tier security auditor on BNB Smart Chain.",
+  "license": "MIT",
+  "homepage": "https://lucace-inception-flap-scanner.hf.space",
+  "repository": "https://github.com/Lukecele/inception-flap-scanner",
+  "network": {
+    "name": "BNB Smart Chain",
+    "short_name": "BSC",
+    "chainId": 56
+  },
+  "architecture": {
+    "runtime": "Node.js 22 / Vite / React 19",
+    "containerization": "Docker (Hugging Face Spaces SDK)",
+    "data_feed": "On-chain RPC event streaming & Flap.sh bonding curve decoding",
+    "security_filters": [
+      "ERC-1167 minimal proxy bytecode verification",
+      "Dynamic predatory tax detection (<= 8% threshold)",
+      "Social media duplicate and phishing heuristic engine",
+      "Developer funding wallet clustering analysis"
+    ]
+  },
+  "curated_indexing": {
+    "awesome_web3": "https://github.com/ahmet/awesome-web3/pull/795",
+    "on_chain_investigations": "https://github.com/OffcierCia/On-Chain-Investigations-Tools-List/pull/46"
+  },
+  "community": {
+    "telegram": "https://t.me/ArbitrageInception",
+    "security_contact": "luca.celebrano1@gmail.com"
+  }
+}
