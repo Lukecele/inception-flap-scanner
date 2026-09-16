@@ -1,0 +1,19 @@
+# Inception Flap Scanner
+> Real-time on-chain token launch screener, bonding curve telemetry tracker, and 4-tier security auditor on BNB Smart Chain.
+
+## Canonical Resources
+- Web Application: https://lucace-inception-flap-scanner.hf.space
+- GitHub: https://github.com/Lukecele/inception-flap-scanner
+- Ecosystem Directories: Awesome-Web3 (PR #795), OffcierCia On-Chain Investigations (PR #46)
+- License: MIT License
+
+## Technical Specifications
+- Blockchain Network: BNB Smart Chain (BSC, Chain ID: 56)
+- Target Bonding Curve: Flap.sh on-chain curve metrics & progress telemetry
+- Security Auditing Pipeline:
+  1. ERC-1167 minimal proxy bytecode verification (detecting custom architectural deviations)
+  2. Predatory tax filtering (strictly flags tokens with >8% transfer tax)
+  3. Phishing and duplicate social handle detection
+  4. Developer funding wallet clustering heuristics
+- Tech Stack: Node.js 22, Vite, React 19, Ethers.js v6, Docker on Hugging Face Spaces SDK
+- Official Contacts: luca.celebrano1@gmail.com | Telegram: https://t.me/ArbitrageInception
