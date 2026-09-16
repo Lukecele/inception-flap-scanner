@@ -21,12 +21,12 @@
     "ethers": "^6.17.0",
     "gmgn-cli": "^1.4.9",
     "lucide-react": "^1.22.0",
-    "react": "^19.2.7",
+    "react": "^19.3.0",
     "react-dom": "^19.2.7",
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "@types/react": "^19.2.17",
+    "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "oxlint": "^1.69.0",
