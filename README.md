@@ -37,8 +37,8 @@ flowchart TD
     end
 
     subgraph SecurityChecks["Automated 4-Tier Security Suite"]
-        Auditor --> Tax["1. Tax and Honeypot Safeguard<br/>(Strict Max 8% Safe Threshold)"]
-        Auditor --> Proxy["2. Bytecode Analysis<br/>(ERC-1167 Minimal Proxy Verification)"]
+        Auditor --> Tax["1. Tax and Bot Dust Filter<br/>(Max 8% Spam and Honeypot Safeguard)"]
+        Auditor --> Proxy["2. Bytecode Analysis<br/>(ERC-1167 Proxy vs Custom Architecture)"]
         Auditor --> Phish["3. Social Media Clone Detector<br/>(Levenshtein Distance and Blacklist)"]
         Auditor --> Dev["4. Dev Wallet Clustering<br/>(Funding Source and Serial Deployer Check)"]
     end
@@ -60,8 +60,8 @@ flowchart TD
 
 ### 2. Automated 4-Tier Security Auditor
 Before interacting with any newly deployed token, the built-in deterministic auditor analyzes 4 vulnerability vectors:
-1. **Tax & Honeypot Safeguard (≤8% Threshold):** Automatically queries buy and sell tax rates. Any token with taxes exceeding 8% is flagged as predatory (accounting for Flap's 1% platform fee, guaranteeing a total transaction tax under 9%).
-2. **ERC-1167 Minimal Proxy Verification:** Decodes runtime bytecode against official Flap minimal proxy implementations (`0x363d3d373d3d3d363d73...5af43d82803e903d91602b57fd5bf3`), flagging unverified, custom, or suspicious contract proxies.
+1. **Tax & Bot Dust Filter (≤8% Threshold):** Automatically queries buy and sell tax rates. Serves as a primary mempool defense against high-frequency bot-driven dust launch spam and predatory honeypots, purging arbitrary or punitive fees from the radar stream (accounting for Flap's 1% platform fee, guaranteeing a total transaction tax under 9%).
+2. **ERC-1167 Minimal Proxy Verification:** Decodes runtime bytecode against official Flap minimal proxy implementations (`0x363d3d373d3d3d363d73...5af43d82803e903d91602b57fd5bf3`). Instantly distinguishes standard factory clones from non-standard custom proxy contracts, detecting custom tokenomic innovations, experimental bonding curves, or unverified modifications.
 3. **Social Clone & Phishing Detection:** Flags token impersonators, copycats, and duplicate social media handles (Twitter/X, Telegram) matching known projects.
 4. **Dev Wallet Clustering & Funding Origin:** Classifies deployer funding wallets (CEX/bridge vs. fresh private addresses) and tracks serial deployer history.
 
