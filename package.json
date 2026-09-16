@@ -9,11 +9,12 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node -e \"console.log('\\x1b[35m\\n⚡ Inception Flap Scanner | Real-Time Bonding Curve Terminal\\x1b[0m\\x1b[33m\\n⭐ Support on GitHub: https://github.com/Lukecele/inception-flap-scanner\\x1b[0m\\n')\" && vite",
     "build": "vite build",
     "test": "node --test tests/*.test.mjs",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "node -e \"console.log('\\x1b[36m\\n⭐ Thank you for using Inception Flap Scanner! Please star it on GitHub: https://github.com/Lukecele/inception-flap-scanner\\x1b[0m\\n')\" || true"
   },
   "dependencies": {
     "cloudscraper": "^4.6.0",
