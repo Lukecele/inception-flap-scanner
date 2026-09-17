@@ -13,7 +13,7 @@ app_port: 7860
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow)](https://huggingface.co/spaces/Lucace/inception-flap-scanner)
 [![Security Audit](https://img.shields.io/badge/Security-4--Tier_Audit-66fcf1)](#-automated-4-tier-security-auditor)
 [![Awesome-Web3](https://awesome.re/mentioned-badge.svg)](https://github.com/ahmet/awesome-web3/blob/main/README.md#L345)
-[![GitHub stars](https://img.shields.io/github/stars/Lukecele/inception-flap-scanner?style=social)](https://github.com/Lukecele/inception-flap-scanner)
+[![GitHub stars](https://img.shields.io/github/stars/arbincept/inception-flap-scanner?style=social)](https://github.com/arbincept/inception-flap-scanner)
 
 A real-time on-chain token launch screener, Flap.sh bonding curve telemetry tracker, and automated 4-tier contract security auditor on **BNB Smart Chain (BSC)**. Fully containerized with Docker and continuously deployed on Hugging Face Spaces.
 
@@ -132,7 +132,7 @@ Visit [http://localhost:7860](http://localhost:7860) to view the scanner dashboa
 
 If you find this real-time screener or 4-tier security auditor useful for your research, monitoring, or on-chain tooling, please consider dropping a **Star** on GitHub. It directly supports open-source development and ecosystem maintenance!
 
-[![GitHub stars](https://img.shields.io/github/stars/Lukecele/inception-flap-scanner?style=social)](https://github.com/Lukecele/inception-flap-scanner)
+[![GitHub stars](https://img.shields.io/github/stars/arbincept/inception-flap-scanner?style=social)](https://github.com/arbincept/inception-flap-scanner)
 
 ---
 
