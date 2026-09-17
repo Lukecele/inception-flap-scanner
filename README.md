@@ -28,24 +28,28 @@ A real-time on-chain token launch screener, Flap.sh bonding curve telemetry trac
 
 ```mermaid
 flowchart TD
-    Node["BNB Smart Chain Nodes<br/>(WebSocket and JSON-RPC)"] --> Ingestion["Live Contract Listener and Log Decoder"]
+    Node["BNB Smart Chain Nodes<br>(WebSocket and JSON-RPC)"] --> Ingestion["Live Contract Listener and Log Decoder"]
     
     subgraph CoreEngine["On-Chain Ingestion and Telemetry"]
-        Ingestion --> Sorter["Mempool Sorter and Deduplicator<br/>(Strict Timestamp Descending)"]
+        Ingestion --> Sorter["Mempool Sorter and Deduplicator<br>(Strict Timestamp Descending)"]
         Sorter --> Auditor["4-Tier Security Auditor"]
-        Sorter --> CurveTelemetry["Flap.sh Bonding Curve Telemetry Engine<br/>(Progress Percent, Liquidity, Top 10 Holders)"]
+        Sorter --> CurveTelemetry["Flap.sh Bonding Curve Telemetry Engine<br>(Progress Percent, Liquidity, Top 10 Holders)"]
     end
 
     subgraph SecurityChecks["Automated 4-Tier Security Suite"]
-        Auditor --> Tax["1. Tax and Bot Dust Filter<br/>(Max 8% Spam and Honeypot Safeguard)"]
-        Auditor --> Proxy["2. Bytecode Analysis<br/>(ERC-1167 Proxy vs Custom Architecture)"]
-        Auditor --> Phish["3. Social Media Clone Detector<br/>(Levenshtein Distance and Blacklist)"]
-        Auditor --> Dev["4. Dev Wallet Clustering<br/>(Funding Source and Serial Deployer Check)"]
+        Auditor --> Tax["1. Tax and Bot Dust Filter<br>(Max 8% Spam and Honeypot Safeguard)"]
+        Auditor --> Proxy["2. Bytecode Analysis<br>(ERC-1167 Proxy vs Custom Architecture)"]
+        Auditor --> Phish["3. Social Media Clone Detector<br>(Levenshtein Distance and Blacklist)"]
+        Auditor --> Dev["4. Dev Wallet Clustering<br>(Funding Source and Serial Deployer Check)"]
+        Tax --> Verdict["Consolidated Risk Score and Verdict"]
+        Proxy --> Verdict
+        Phish --> Verdict
+        Dev --> Verdict
     end
 
     subgraph UI["Interactive High-Contrast Interface (React 19)"]
         CurveTelemetry --> TerminalUI["Live Launch Feed and Radar Stream"]
-        SecurityChecks --> ModalUI["Portal Modal: Deep Audit and Telemetry"]
+        Verdict --> ModalUI["Portal Modal: Deep Audit and Telemetry"]
         ModalUI --> DexScreener["Interactive DexScreener Visual Chart"]
     end
 ```
