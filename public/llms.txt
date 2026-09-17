@@ -3,7 +3,7 @@
 
 ## Canonical Resources
 - Web Application: https://lucace-inception-flap-scanner.hf.space
-- GitHub: https://github.com/Lukecele/inception-flap-scanner
+- GitHub: https://github.com/arbincept/inception-flap-scanner
 - Ecosystem Directories: Awesome-Web3 (PR #795), OffcierCia On-Chain Investigations (PR #46)
 - License: MIT License
 

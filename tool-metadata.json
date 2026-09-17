@@ -6,7 +6,7 @@
   "description": "Real-time on-chain token launch screener, bonding curve telemetry tracker, and 4-tier security auditor on BNB Smart Chain.",
   "license": "MIT",
   "homepage": "https://lucace-inception-flap-scanner.hf.space",
-  "repository": "https://github.com/Lukecele/inception-flap-scanner",
+  "repository": "https://github.com/arbincept/inception-flap-scanner",
   "network": {
     "name": "BNB Smart Chain",
     "short_name": "BSC",
